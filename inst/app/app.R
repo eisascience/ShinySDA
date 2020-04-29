@@ -20,6 +20,21 @@ library(shinyFiles)
 library("BiocParallel")
 register(MulticoreParam(4))
 
+# if (Sys.getenv("SCRATCH_DIR") != "") {
+#   cachedir <- paste0(Sys.getenv("SCRATCH_DIR"), "ShinySDA-cache")
+# } else {
+#   cachedir <- paste0(Sys.getenv("TMPDIR"), "ShinySDA-cache")
+# }
+
+if(file.exists("/scratch/data/")){
+  init.path = "/scratch/data/"
+} else {
+  if(file.exists("../../../../../Expts/")){
+  init.path = "../../../../../Expts/"
+} else {
+  init.path = getwd()#Sys.getenv("TMPDIR")
+}
+  }
 
 source(system.file('app/fxs.R', package = 'ShinySDA', mustWork = TRUE), local = TRUE)
 
@@ -69,7 +84,7 @@ ui <- dashboardPage(skin="red",
                                   valueBoxOutput("InfoBox", width = 6),
                                   
                                   box(textInput("SDAroot", "Path to SDA folders. Expects dimnames in one dir up.", 
-                                                value ="../../../Expts/TetCombo4/data/sda_results"), #/Tet_SDADGE_DropSim_mi10000_nc40_N21509_rep1
+                                                value =init.path), 
                                       uiOutput("select.folder"),
                                       actionButton("loadSDA", "Load SDA"),
                                       actionButton("getGeneAnn", "Get Gene Annotations"),
