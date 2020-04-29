@@ -26,15 +26,11 @@ register(MulticoreParam(4))
 #   cachedir <- paste0(Sys.getenv("TMPDIR"), "ShinySDA-cache")
 # }
 
-if(file.exists("/scratch/data/")){
-  init.path = "/scratch/data/"
+if (Sys.getenv("SCRATCH_DIR") != "") {
+  init.path = paste0(Sys.getenv("SCRATCH_DIR"), "data")
 } else {
-  if(file.exists("../../../../../Expts/")){
-  init.path = "../../../../../Expts/"
-} else {
-  init.path = getwd()#Sys.getenv("TMPDIR")
+  init.path = getwd()
 }
-  }
 
 source(system.file('app/fxs.R', package = 'ShinySDA', mustWork = TRUE), local = TRUE)
 
