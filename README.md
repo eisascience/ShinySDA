@@ -1,8 +1,8 @@
 # ShinySDA (SiSDA)
 
-A shiny app to load and browse SDA objects. 
+A shiny app to load, browse, and process SDA objects. 
 
-The goal of this app is to make the processing of SDA results including QC and component selection
+The goal of this app is to make a reproducible processing framework of SDA results including QC and component selection.
 
 In this version we use Seurat data structure to store the results and customize their functions for various needs herein.
 
@@ -26,5 +26,20 @@ Stuart and Butler et al. Comprehensive integration of single cell data. bioRxiv 
 
 Bimber Lab:
 
-@eisamahyari
+Produced by: @eisamahyari
+Converted to an R packaged by Kosiso Onwuzu.
+
+
+## Install : 
+
+
+    devtools::install_github(repo = 'bimberlabinternal/ShinySDA', dependencies = T, upgrade = 'always')
+
+## Launch : 
+
+    ShinySDA::launchShinySDA()
+  
+ 
+
+
 
