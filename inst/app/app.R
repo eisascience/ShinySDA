@@ -16,6 +16,7 @@ library(gridExtra)
 library(dplyr)
 library(Seurat)
 library(shinyFiles)
+library(SDAtools)
 
 library("BiocParallel")
 register(MulticoreParam(4))
