@@ -39,6 +39,7 @@ Imports:
     org.Mmu.eg.db,
     biomaRt,
     Seurat
+    SDAtools
 Suggests:
     ggvis,
     devtools
