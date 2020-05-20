@@ -28,12 +28,13 @@ register(MulticoreParam(4))
 
 if (Sys.getenv("SCRATCH_DIR") != "") {
   init.path = paste0(Sys.getenv("SCRATCH_DIR"), "data")
-} else {
+}  else {
   init.path = getwd()
 }
 
 source(system.file('app/fxs.R', package = 'ShinySDA', mustWork = TRUE), local = TRUE)
 
+print(Sys.getenv("SCRATCH_DIR"))
 
 ui <- dashboardPage(skin="red",
                     dashboardHeader(title = "ShinySDA"),
