@@ -4,7 +4,7 @@ Version: 1.0.0
 Authors@R: 
     person(given = "eisamahyari",
            role = c("aut", "cre"),
-           email = "eisamahyari@tweeter.com")
+           email = "mahyarie@ohsu.edu")
 Description: The goal of this app is to make the processing of SDA results including QC and component selection.
 License: `use_gpl3_license()`
 Encoding: UTF-8
@@ -42,5 +42,6 @@ Imports:
 Suggests:
     ggvis,
     devtools
-    
+Remotes:
+    marchinilab/SDAtools
 
