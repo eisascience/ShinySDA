@@ -38,7 +38,7 @@ Imports:
     org.Hs.eg.db,
     org.Mmu.eg.db,
     biomaRt,
-    Seurat
+    Seurat,
     SDAtools
 Suggests:
     ggvis,
