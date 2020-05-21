@@ -28,7 +28,7 @@ register(MulticoreParam(4))
 # }
 
 if (Sys.getenv("SCRATCH_DIR") != "") {
-  init.path = paste0(Sys.getenv("SCRATCH_DIR"), "data")
+  init.path = paste0(Sys.getenv("SCRATCH_DIR"), "/data")
 }  else {
   init.path = getwd()
 }
