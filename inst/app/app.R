@@ -77,7 +77,7 @@ ui <- dashboardPage(skin="red",
                       tabItems(
                         # First tab content
                         tabItem(tabName = "MainDash",
-                                h2("Main Dashboard of ShinySDA"),
+                                h2("Main Dashboard of ShinySDA: Make sure _MetaDF.rds includes $SubjectId, $ExpID, $EXP.ID, $SampleDate, $SingleR_Labels, $BarcodePrefix"),
                                 fluidRow(
                                   valueBoxOutput("InfoBox", width = 6),
                                   
@@ -820,7 +820,7 @@ server <- function(input, output, session) {
       sum(SDAres$component_statistics$max_score > MaxScore.thr)
       
       ggplot(SDAres$component_statistics, aes(y=max_score)) + geom_boxplot(outlier.colour="red", outlier.shape=8,
-                                                                           outlier.size=2) + 
+                                                                           outlier.size = 2) + 
         geom_abline(slope=0, intercept = MaxScore.thr, colour="red") + 
         geom_abline(slope=0, intercept = MaxScore.thr9, colour="dodgerblue")+ 
         geom_abline(slope=0, intercept = MaxScore.thr75, colour="navy")+ 
@@ -847,7 +847,7 @@ server <- function(input, output, session) {
       
       
       ggplot(tsneDF, aes(tSNE1_all, tSNE2_all, color=(SumScore))) +
-        geom_point(size=0.5) + theme_bw() + 
+        geom_point(size = 1) + theme_bw() + 
         scale_color_distiller(palette = "Spectral") +
         theme(legend.position = "bottom") +
         ggtitle("tSNE SDA qc Components\n Sum absolute-cell-scores normalized by its mean \n ")
@@ -873,7 +873,7 @@ server <- function(input, output, session) {
         tsneDF$SumScore <- tsneDF$SumScore/mean(tsneDF$SumScore)
         
         ggplot(tsneDF, aes(tSNE1_qc, tSNE2_qc, color=(SumScore))) +
-          geom_point(size=0.5) + theme_bw() + 
+          geom_point(size = 1) + theme_bw() + 
           scale_color_distiller(palette = "Spectral") +
           theme(legend.position = "bottom") +
           ggtitle("tSNE SDA qc Components\n  Sum absolute-cell-scores normalized by its mean \n ")
@@ -883,7 +883,7 @@ server <- function(input, output, session) {
         tsneDF$library_size <- MetaDF[rownames(tsneDF), ]$library_size
         
         ggplot(tsneDF, aes(tSNE1_qc, tSNE2_qc, color=log10(library_size))) +
-          geom_point(size=0.5) + theme_bw() + 
+          geom_point(size = 1) + theme_bw() + 
           scale_color_distiller(palette = "Spectral") +
           theme(legend.position = "bottom") +
           ggtitle("tSNE SDA qc Components\n log10 library size \n ")
@@ -1116,9 +1116,9 @@ server <- function(input, output, session) {
       tempDFX$SDAComp <- SDAres$scores[,paste0("SDA", zN, sep="")]
       
       ggplot(tempDFX, aes(tSNE1_qc, tSNE2_qc,  color=cut(asinh(SDAComp^3), breaks = c(-Inf, -1, -.5, 0, .5, 1, Inf)))) +
-        geom_point(size=0.1) + theme_bw() +
+        geom_point(size = 1) + theme_bw() +
         scale_color_manual("CS", values = rev(c("red", "orange", "yellow", "lightblue", "dodgerblue", "blue")) ) + 
-        guides(colour = guide_legend(override.aes = list(size=2, alpha=1))) +
+        guides(colour = guide_legend(override.aes = list(size = 2, alpha=1))) +
         theme(legend.position = "bottom", aspect.ratio=1) + 
         simplify2 + coord_cartesian(xlim = NULL, ylim = NULL, expand = FALSE) + ggtitle(paste0("SDA", zN, sep=""))+ylab("asinh(SDAscore^3)")
       
@@ -1437,12 +1437,12 @@ server <- function(input, output, session) {
                         experiment = MetaDF$EXP.ID, 
                         ColFac = MetaDF$BarcodePrefix), 
              aes(cell_index, score, colour = ColFac)) + 
-        geom_point(size = 0.5, stroke = 0) + 
+        geom_point(size = 1, stroke = 0) + 
         xlab("Cell Index") + ylab("asinh(Score^3)") + 
         #scale_color_brewer(palette = "Paired") + 
         theme_bw() + 
         theme(legend.position = "bottom") + 
-        guides(colour = guide_legend(ncol = 4, override.aes = list(size=2, alpha=1))) +
+        guides(colour = guide_legend(ncol = 4, override.aes = list(size = 2, alpha=1))) +
         scale_colour_manual(values =(col_vector),
                             guide = guide_legend(nrow=2)) +
         # guides(color = guide_legend(ncol = 2, override.aes = list(size = 2))) +
@@ -1487,7 +1487,7 @@ server <- function(input, output, session) {
       
       ggplot(tempDF, 
              aes(cell_index, score, colour = ColFac)) + 
-        geom_jitter(size=1, width=0, height = 3, alpha = .6) +
+        geom_jitter(size = 1, width=0, height = 3, alpha = .6) +
         # geom_boxplot(aes(x= factor(cut(cell_index, quantile(tempDF$cell_index))), y=score, 
                          # colour = ColFac), outlier.colour = "red", outlier.shape = 8) +
         # geom_point(size = 0.5, stroke = 0) + 
@@ -1495,7 +1495,7 @@ server <- function(input, output, session) {
         #scale_color_brewer(palette = "Paired") + 
         theme_bw() + 
         theme(legend.position = "none") + 
-        guides(colour = guide_legend(ncol = 4, override.aes = list(size=2, alpha=1))) +
+        guides(colour = guide_legend(ncol = 4, override.aes = list(size = 2, alpha=1))) +
         scale_colour_manual(values =(col_vector),
                             guide = guide_legend(nrow=2)) +
         # guides(color = guide_legend(ncol = 2, override.aes = list(size = 2))) +
@@ -1530,7 +1530,7 @@ server <- function(input, output, session) {
         tsneDF$SumScore <- tsneDF$SumScore/mean(tsneDF$SumScore)
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=(SumScore))) +
-          geom_point(size=0.5) + theme_bw() +
+          geom_point(size = 1) + theme_bw() +
           scale_color_distiller(palette = "Spectral")  +
           ggtitle("tSNE SDA batch removed\n  Sum absolute-cell-scores normalized by its mean \n ")+
           theme(legend.position = "bottom", aspect.ratio=1)
@@ -1540,7 +1540,7 @@ server <- function(input, output, session) {
         tsneDF$library_size <- MetaDF[rownames(tsneDF), ]$library_size
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=log10(library_size))) +
-          geom_point(size=0.5) + theme_bw() +
+          geom_point(size = 1) + theme_bw() +
           scale_color_distiller(palette = "Spectral")  +
           ggtitle("tSNE SDA batch removed\n log10 library size \n ")+
           theme(legend.position = "bottom", aspect.ratio=1)
@@ -1571,7 +1571,7 @@ server <- function(input, output, session) {
         tsneDF$SumScore <- tsneDF$SumScore/mean(tsneDF$SumScore)
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=(SumScore))) +
-          geom_point(size=0.5) + theme_bw() +
+          geom_point(size = 1) + theme_bw() +
           scale_color_distiller(palette = "Spectral")  +
           ggtitle("tSNE SDA batch removed\n  Sum absolute-cell-scores normalized by its mean \n No Meta loaded")+
           theme(legend.position = "bottom", aspect.ratio=1)
@@ -1582,13 +1582,13 @@ server <- function(input, output, session) {
         tsneDF$Meta <- MetaDF[rownames(tsneDF), input$Metaselect1]
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=Meta)) +
-          geom_point(size=0.1, alpha=.4)+ theme_bw() +
+          geom_point(size = 1, alpha=.4)+ theme_bw() +
           theme(legend.position = "bottom", aspect.ratio=1) +
           ggtitle(paste0("tSNE - batch removed cell scores\n", input$Metaselect1)) +
           scale_color_manual(values = col_vector
                              #c(rep(colorRampPalette(brewer.pal(12,"Paired"))(30),2),"black","grey")
           ) + 
-          guides(colour = guide_legend(override.aes = list(size=2, alpha=1), ncol=5))
+          guides(colour = guide_legend(override.aes = list(size = 2, alpha=1), ncol=5))
         
         
       }
@@ -1615,7 +1615,7 @@ server <- function(input, output, session) {
         tsneDF$SumScore <- tsneDF$SumScore/mean(tsneDF$SumScore)
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=(SumScore))) +
-          geom_point(size=0.5) + theme_bw() +
+          geom_point(size = 1) + theme_bw() +
           scale_color_distiller(palette = "Spectral")  +
           ggtitle("tSNE SDA batch removed\n  Sum absolute-cell-scores normalized by its mean \n No Meta loaded")+
           theme(legend.position = "bottom", aspect.ratio=1)
@@ -1626,13 +1626,13 @@ server <- function(input, output, session) {
         tsneDF$Meta <- MetaDF[rownames(tsneDF), input$Metaselect2]
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=Meta)) +
-          geom_point(size=0.1, alpha=.4)+ theme_bw() +
+          geom_point(size = 1, alpha=.4)+ theme_bw() +
           theme(legend.position = "bottom", aspect.ratio=1) +
           ggtitle(paste0("tSNE - batch removed cell scores\n", input$Metaselect2)) +
           scale_color_manual(values = col_vector
                              #c(rep(colorRampPalette(brewer.pal(12,"Paired"))(30),2),"black","grey")
           ) + 
-          guides(colour = guide_legend(override.aes = list(size=2, alpha=1), ncol=5))
+          guides(colour = guide_legend(override.aes = list(size = 2, alpha=1), ncol=5))
         
         
       }
@@ -1659,7 +1659,7 @@ server <- function(input, output, session) {
         tsneDF$SumScore <- tsneDF$SumScore/mean(tsneDF$SumScore)
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=(SumScore))) +
-          geom_point(size=0.5) + theme_bw() +
+          geom_point(size = 1) + theme_bw() +
           scale_color_distiller(palette = "Spectral")  +
           ggtitle("tSNE SDA batch removed\n  Sum absolute-cell-scores normalized by its mean \n No Meta loaded")+
           theme(legend.position = "bottom", aspect.ratio=1)
@@ -1670,13 +1670,13 @@ server <- function(input, output, session) {
         tsneDF$Meta <- MetaDF[rownames(tsneDF), input$Metaselect3]
         
         ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=Meta)) +
-          geom_point(size=0.1, alpha=.4)+ theme_bw() +
+          geom_point(size = 1, alpha=.4)+ theme_bw() +
           theme(legend.position = "bottom", aspect.ratio=1) +
           ggtitle(paste0("tSNE - batch removed cell scores\n", input$Metaselect3)) +
           scale_color_manual(values = col_vector
                              #c(rep(colorRampPalette(brewer.pal(12,"Paired"))(30),2),"black","grey")
           ) + 
-          guides(colour = guide_legend(override.aes = list(size=2, alpha=1), ncol=5))
+          guides(colour = guide_legend(override.aes = list(size = 2, alpha=1), ncol=5))
         
         
       }
@@ -1802,9 +1802,9 @@ server <- function(input, output, session) {
       #              levels = c("(-Inf,-1]", "(-1,-0.5]", "(-0.5,0]",  "(0,0.5]",   "(0.5,1]",   "(1, Inf]" ) ))
       
       ggplot(tempDFX, aes(tSNE1_batch, tSNE2_batch,  color=tempDFX$SDAComp)) +
-        geom_point(size=0.1) + theme_bw() +
+        geom_point(size = 1) + theme_bw() +
         scale_color_manual("CS", values = rev(c("red", "orange", "yellow", "lightblue", "dodgerblue", "blue")) ) + 
-        guides(colour = guide_legend(override.aes = list(size=2, alpha=1))) +
+        guides(colour = guide_legend(override.aes = list(size = 2, alpha=1))) +
         theme(legend.position = "bottom", aspect.ratio=1) + 
         simplify2 + coord_cartesian(xlim = NULL, ylim = NULL, expand = FALSE) +
         ggtitle(paste0("SDA", zN, " :: ", RemoveTag))+
@@ -2104,9 +2104,9 @@ server <- function(input, output, session) {
       
       ggplot(tempDFX, aes(tSNE1_batch, tSNE2_batch,  color=cut(asinh(GeneExpr^3),
                                                                breaks = c(-Inf, -1, -.5, 0, .5, 1, Inf)))) +
-        geom_point(size=.5) + theme_bw() +
+        geom_point(size = 1) + theme_bw() +
         scale_color_manual("Expr", values = rev(c("red", "orange", "yellow", "lightblue", "dodgerblue", "blue")) ) +
-        guides(colour = guide_legend(override.aes = list(size=2, alpha=1))) +
+        guides(colour = guide_legend(override.aes = list(size = 2, alpha=1))) +
         theme(legend.position = "bottom", aspect.ratio=1) +
         simplify2 + coord_cartesian(xlim = NULL, ylim = NULL, expand = FALSE) +
         ggtitle(paste0("SDA-Batch-removed DGE\n", TitleX))+

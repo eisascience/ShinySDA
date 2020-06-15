@@ -6,6 +6,18 @@ The goal of this app is to make a reproducible processing framework of SDA resul
 
 In this version we use Seurat data structure to store the results and customize their functions for various needs herein.
 
+## Usage
+
+This app expects the following hierarchy in the dir path it is looking: 
+
+MyExperiment > sda_results > MySDAOuts
+
+The MySdaOuts is the path that has the it#### folders. Also tSNE and other shinySDA analysis are saved here.
+
+sda_results is a folder upstream which stores or or several replicates of the same SDA run with a common Meta data. 
+
+MyExperiment is a folder upstream of sda_results. It should have a dataframe (with the right rownames) saverd as _MetaDF.rds in this folder. Also the SDA input files (the matrix file and _dimnames.rds) need to be here. 
+
 
 
 

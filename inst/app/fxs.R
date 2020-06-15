@@ -74,14 +74,14 @@ print_loadings_scores <- function(SDAResult = NA, ComponentN=NA, ColFac = NA, Pr
                           score = SDAScores[, paste0(Prefix, ComponentN)], experiment = gsub("_.*", 
                                                                                              "", gsub("[A-Z]+\\.", "", rownames(SDAScores))), ColFac = ColFac), 
                aes(cell_index, score, colour = ColFac)) + 
-    geom_point(size = 0.5, stroke = 0) + 
+    geom_point(size = 1, stroke = 0) + 
     xlab("Cell Index") + ylab("Score") + 
     #scale_color_brewer(palette = "Paired") + 
     
     
     theme_bw() + 
     theme(legend.position = "bottom") + 
-    guides(colour = guide_legend(override.aes = list(size=2, alpha=1))) +
+    guides(colour = guide_legend(override.aes = list(size = 2, alpha=1))) +
     scale_colour_manual(values = colorRampPalette(solarized_pal()(8))(length(levels(ColFac))),
                         guide = guide_legend(nrow=2)) +
     #guides(color = guide_legend(ncol = 2, override.aes = list(size = 2))) + 
@@ -162,10 +162,10 @@ go_volcano_plot <- function(x=GO_data, component="V5N", extraTitle=""){
   if(extraTitle=="") extraTitle = paste("Component : ", component, sep="")
   
   #print(
-  ggplot(data.table(x[[component]]), aes(GeneOdds/BgOdds, -log(pvalue), size=Count)) +
+  ggplot(data.table(x[[component]]), aes(GeneOdds/BgOdds, -log(pvalue), size = Count)) +
     geom_point(aes(colour=p.adjust<0.05)) +
     scale_size_area() +
-    geom_label_repel(data = data.table(x[[component]])[order(p.adjust)][1:30][p.adjust<0.7], aes(label = Description, size=0.25), size = 3, force=2) + 
+    geom_label_repel(data = data.table(x[[component]])[order(p.adjust)][1:30][p.adjust<0.7], aes(label = Description, size = 0.25), size = 3, force=2) + 
     ggtitle(paste("",extraTitle, sep="\n") ) +
     xlab("Odds Ratio") +
     scale_x_log10(limits=c(1,NA), breaks=c(1,2,3,4,5,6,7,8))
