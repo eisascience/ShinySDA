@@ -2077,26 +2077,26 @@ server <- function(input, output, session) {
         
         TitleX = paste0("Sum-Expr of :", paste(GeneSet, collapse = "_") )
         
+        LoadOrdVal <- round(SDAres$loadings[[1]][,as.character(GeneSet[1])][order(abs(SDAres$loadings[[1]][,as.character(GeneSet[1])]), decreasing = T)], 3)
+        
+        
         
       } else if(length(GeneSet)==1){
         GeneExpr <- SDAres$scores %*% SDAres$loadings[[1]][,as.character(GeneSet)]
         TitleX = paste0("Expr of :", GeneSet )
-        
+        LoadOrdVal <- round(SDAres$loadings[[1]][,as.character(GeneSet)][order(abs(SDAres$loadings[[1]][,as.character(GeneSet)]), decreasing = T)], 3)
         
       } else if(!length(GeneSet)>=1)  {
         GeneExpr <- SDAres$scores %*% rep(0, nrow(SDAres$loadings[[1]]))
         TitleX = "No genes in input"
+        LoadOrdVal = paste("g",1:20)
       }
       
       
       
       tempDFX[rownames(GeneExpr), ]$GeneExpr <- GeneExpr[,1]
       
-      
-      
-      
-      
-      
+
       # tempDFX <- (envv$tSNEGEx_br)
       print(head(tempDFX))
       # TitleX <- envv$tSNEGEx_tit
@@ -2108,9 +2108,21 @@ server <- function(input, output, session) {
         scale_color_manual("Expr", values = rev(c("red", "orange", "yellow", "lightblue", "dodgerblue", "blue")) ) +
         guides(colour = guide_legend(override.aes = list(size = 2, alpha=1))) +
         theme(legend.position = "bottom", aspect.ratio=1) +
-        simplify2 + coord_cartesian(xlim = NULL, ylim = NULL, expand = FALSE) +
-        ggtitle(paste0("SDA-Batch-removed DGE\n", TitleX))+
+        simplify2 + coord_cartesian(xlim = NULL, ylim = NULL, expand = FALSE)  +
+        labs(title = paste0("SDA-Batch-removed DGE\n", TitleX), 
+             subtitle = paste("Found in comps: \n",
+                              paste(names(LoadOrdVal)[1:5], collapse = ", "), 
+                              "\n",
+                              paste(LoadOrdVal[1:5], collapse = ", "), 
+                              "\n",
+                              paste(names(LoadOrdVal)[6:10], collapse = ", "), 
+                              "\n",
+                              paste(LoadOrdVal[6:10], collapse = ", "), 
+                              "\n"), 
+             caption = "Caption here") + 
         ylab("asinh(GeneExpr^3)")
+        # ggtitle(paste0("SDA-Batch-removed DGE\n", TitleX))+
+        # ylab("asinh(GeneExpr^3)")
       
       
       
