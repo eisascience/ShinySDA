@@ -334,6 +334,9 @@ ui <- dashboardPage(skin="red",
                                       collapsible = TRUE,
                                       actionButton("prevSDA_br2", "Prev comp"),
                                       actionButton("nextSDA_br2", "Next comp"),
+                                      actionButton("C2Cpos", "Copy2ClipPosGenes"),
+                                      actionButton("C2Cneg", "Copy2ClipNegGenes"),
+                                      textInput("NoOfGenes", "No. of Genes to output:", "20"),
                                       textInput("SDAVn", "SDA comp. No:"),
                                       plotOutput("SDAtsne_br2"),
                                       width=5, background = "black"
@@ -1065,6 +1068,9 @@ server <- function(input, output, session) {
   })
   
   ## Batch removal tab--------------------------------------
+  
+  
+ 
   
   observeEvent(input$nextSDA_br, {
     SDAorder <- 1:as.numeric(envv$SDAres$command_arguments$num_comps)
@@ -1904,17 +1910,54 @@ server <- function(input, output, session) {
     
   })
   
+  observeEvent(input$C2Cpos, {
+    
+    
+    Out1 <- print_gene_list(results=envv$SDAres, as.numeric(envv$QC_compIter), PosOnly = T) %>%
+      #group_by(package) %>%
+      #tally() %>%
+      #arrange(desc(n), tolower(package)) %>%
+      #mutate(percentage = n / nrow(pkgData()) * 100) %>%
+      #select("Package name" = package, "% of downloads" = percentage) %>%
+      as.data.frame() %>%
+      head(as.numeric(input$NoOfGenes)) 
+    Out1 <- Out1$Gene.Name
+    
+    # print(Out1)
+    clipr::write_clip(Out1)
+    
+  })
+  
+  
+  observeEvent(input$C2Cneg, {
+    
+    
+    Out2 <- print_gene_list(results=envv$SDAres, as.numeric(envv$QC_compIter), NegOnly = T) %>%
+      #group_by(package) %>%
+      #tally() %>%
+      #arrange(desc(n), tolower(package)) %>%
+      #mutate(percentage = n / nrow(pkgData()) * 100) %>%
+      #select("Package name" = package, "% of downloads" = percentage) %>%
+      as.data.frame() %>%
+      head(as.numeric(input$NoOfGenes)) 
+    Out2 <- Out2$Gene.Name
+    
+    # print(Out1)
+    clipr::write_clip(Out2)
+    
+  })
+  
   output$packageTablePos <- renderTable({
     
     print_gene_list(results=envv$SDAres, as.numeric(envv$QC_compIter), PosOnly = T) %>%
       as.data.frame() %>%
-      head(as.numeric(50))
+      head(as.numeric(input$NoOfGenes))
   }, digits = 1)
   
   output$packageTableNeg <- renderTable({
     print_gene_list(results=envv$SDAres, as.numeric(envv$QC_compIter), NegOnly = T) %>%
       as.data.frame() %>%
-      head(as.numeric(50))
+      head(as.numeric(input$NoOfGenes))
   }, digits = 1)
   
   
