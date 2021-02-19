@@ -127,7 +127,7 @@ get.location <- function(gene.symbols, data_set, gene_name){
 
 
 GO_enrichment <- function(results = NULL, component, geneNumber = 100, threshold=0.01, side="N", OrgDb = NULL){
-  # results = SDAres; component = 1; geneNumber = 100; threshold=0.01; side="N"; OrgDb = HuMAN
+  # results = SDAres; component = 1; geneNumber = 100; threshold=0.01; side="N"; OrgDb = RefGenome
   
   if(side=="N"){
     top_genes <- data.table(as.matrix(results$loadings[[1]][component, ]), keep.rownames = TRUE)[order(V1)][1:geneNumber]$rn

@@ -81,18 +81,28 @@ ui <- dashboardPage(skin="red",
                                 fluidRow(
                                   valueBoxOutput("InfoBox", width = 6),
                                   
+                                  box(title = "SpeciesSelect", status = "primary", 
+                                      solidHeader = TRUE,collapsible = TRUE,
+                                      selectInput(inputId = 'species',
+                                                  label = 'Species',
+                                                  choices =  c('human', 'mouse', 'rhesus'),
+                                                  selected = , multiple = F),
+                                      width = 3, background = "red"
+                                  ),
+                                  
                                   box(textInput("SDAroot", "Path to SDA folders. Expects dimnames in one dir up.", 
-                                                value =init.path), 
+                                                value =init.path),
                                       uiOutput("select.folder"),
-                                      actionButton("loadSDA", "Load SDA"),
-                                      actionButton("getGeneAnn", "Get Gene Annotations"),
-                                      actionButton("getSDAGo", "Get SDA GO Enrichments"),
-                                      actionButton("runtSNE", "Run tSNE (cs-all)"),
-                                      actionButton("runtSNEQCfilt", "Run tSNE (cs-qc)"),
+                                      actionButton("loadSDA", "0. Load SDA"),
+                                      actionButton("getGeneAnn", "1. Get Gene Annotations"),
+                                      actionButton("getSDAGo", "2. Get SDA GO Enrichments"),
+                                      actionButton("runtSNE", "3. Run tSNE (cs-all)"),
+                                      actionButton("runtSNEQCfilt", "4.5 Run tSNE (cs-qc)"),
                                       # textInput("loadSDAmsg", "File Status", "not loaded"),
                                       width = 10
                                       #fileInput("SDAin", "Browse")
                                   ),
+                                  
                                   box(
                                     title = "QC_MaxScore_filt", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,
@@ -235,6 +245,7 @@ ui <- dashboardPage(skin="red",
                                     actionButton("save_batch_selection", "Save Selection"),
                                     actionButton("load_batch_selection", "Load last Selection"),
                                     actionButton("reset_batch_selection", "Reset last Selection"),
+                                    actionButton("select_all_selection", "Select all"),
                                     width=5, background = "black"),
                                   box(
                                     title = "Run tSNE Batch Removed", status = "primary", solidHeader = TRUE,
@@ -470,6 +481,7 @@ server <- function(input, output, session) {
     
     if(file.exists(envv$path2SDA_dyn)) {
       
+      # loadloc = "/Volumes/Maggie/Work/OHSU/Conrad/R/MouseTestis/AmalgamSC/data/TrioDownSampAmaglam/sda_results"
       # loadloc = "../../../Expts/TetCombo2/data/sda_results/Tet_SDADGE_DropSim_mi10000_nc40_N21509_rep1"
       # loadloc = "../../../../Conrad/R/Utah/sda_results/Testis_Run2/TestisV2_150Kgenes_SDA_mi10000_nc50_N26093_rep1"
       # input <- list(); envv <- list()
@@ -533,8 +545,10 @@ server <- function(input, output, session) {
       
       MetaPath.base <- stringr::str_split(envv$path2SDA_dyn, "sda_results")[[1]][1]
       # MetaPath.base = "../../../Expts/TetCombo3/data/"
+      print(MetaPath.base)
       MetaPath <- list.files(MetaPath.base, full.names = T)[grepl("_MetaDF", list.files(MetaPath.base))][1]
-      
+      if(is.na(MetaPath))       MetaPath <- list.files(envv$path2SDA_dyn, full.names = T)[grepl("_MetaDF", list.files(envv$path2SDA_dyn))][1]
+
       
       if(file.exists(MetaPath)){
         # Maybe this can be a dropdown too..
@@ -561,6 +575,7 @@ server <- function(input, output, session) {
         
         envv$InfoBox_sub = "SDA & Meta Loaded"
       } else {
+        print(MetaPath)
         envv$InfoBox_sub = "SDA Loaded - Meta not found"
       }
       
@@ -595,32 +610,56 @@ server <- function(input, output, session) {
       
       # basename("../../../../Conrad/R/Utah/sda_results/Testis_Run2")
       
-      if(!file.exists(paste0(envv$path2SDA_dyn, "/", head.path,  "_biomaRt_gene_loc_human.rds"))){
+      print(paste0("lookinf for files: ", envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_", input$species, ".rds"))
+      print(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_", input$species,".chromosome.lengths.rds"))
+      print(paste0(envv$path2SDA_dyn, "/", head.path,  "_biomaRt_gene_loc_", 
+                   input$species, ".rds"))
+      
+      if(!file.exists(paste0(envv$path2SDA_dyn, "/", head.path,  "_biomaRt_gene_loc_", 
+                             input$species, ".rds"))){
         
+        if(input$species == "mouse") ens_ds="mmusculus_gene_ensembl"
+        if(input$species == "human") ens_ds="hsapiens_gene_ensembl"
+        if(input$species == "rhesus") ens_ds="mmulatta_gene_ensembl"
+        
+        print("getting gene locations")
         gene_locations <- get.location(gene.symbols=colnames(SDAres$loadings[[1]]),
-                                       data_set = "hsapiens_gene_ensembl",
+                                       data_set = ens_ds,
                                        gene_name = "external_gene_name")
         
-        saveRDS(gene_locations, paste0(envv$path2SDA_dyn, "/", head.path,  "_biomaRt_gene_loc_human.rds"))
+        print("saving gene locations")
+        saveRDS(gene_locations, paste0(envv$path2SDA_dyn, "/", head.path,  "_biomaRt_gene_loc_", 
+                                       input$species, ".rds"))
         
       } else {
-        gene_locations <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path, "_biomaRt_gene_loc_human.rds"))
+        print("loading local biomaRt_gene_loc")
+        gene_locations <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path,  "_biomaRt_gene_loc_", 
+                                         input$species, ".rds"))
       }
       
-      if(!file.exists(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_human.rds"))){
+
+      
+      if(!file.exists(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_", input$species, ".rds"))){
         
+        if(input$species == "mouse") ens_ds="mmusculus_gene_ensembl"
+        if(input$species == "human") ens_ds="hsapiens_gene_ensembl"
+        if(input$species == "rhesus") ens_ds="mmulatta_gene_ensembl"
+        
+        print("loading SDAtools gene locations")
         GeneLoc         <- SDAtools::load_gene_locations(path = base.path,
                                                          genes = colnames(SDAres$loadings[[1]]),
-                                                         organism = "hsapiens_gene_ensembl",
+                                                         organism = ens_ds,
                                                          name="human")
-        chromosome.lengths <- SDAtools::load_chromosome_lengths(organism = "hsapiens_gene_ensembl")
+        print("loading SDAtool chrom lengths")
+        chromosome.lengths <- SDAtools::load_chromosome_lengths(organism = ens_ds)
         
-        saveRDS(GeneLoc, paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_human.rds"))
-        saveRDS(chromosome.lengths, paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_chromosome.lengths.rds"))
+        print("saving SDAtools chrom")
+        saveRDS(GeneLoc, paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_", input$species, ".rds"))
+        saveRDS(chromosome.lengths, paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_", input$species,".chromosome.lengths.rds"))
         
       } else {
-        GeneLoc                <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_human.rds"))
-        chromosome.lengths     <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_chromosome.lengths.rds"))
+        GeneLoc                <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_", input$species, ".rds"))
+        chromosome.lengths     <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_", input$species,".chromosome.lengths.rds"))
       }
       
       envv$chromosome.lengths <- chromosome.lengths
@@ -647,31 +686,38 @@ server <- function(input, output, session) {
       
       head.path <- gsub("/", "", head.path)
       
+      print("starting GO")
       
       SDAres <- envv$SDAres
       
       envv$InfoBox_sub <- paste0(NComps, " comps, ~30 sec per comp")
       
       
+      print(paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))
       
-      
-      if(!file.exists(paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps.rds"))){
+      if(!file.exists(paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))){
         
         library(AnnotationHub) # source("https://bioconductor.org/biocLite.R"); biocLite("AnnotationHub")
         library(clusterProfiler) # source("https://bioconductor.org/biocLite.R"); biocLite("clusterProfiler")
         
         hub <- AnnotationHub()
         
+        if(input$species == "mouse") qrhub="org.MM.eg"
+        if(input$species == "human") qrhub="org.Hs.eg.db"
+        if(input$species == "rhesus") qrhub="org.Mmu.eg.db"
         
-        query(hub, "org.Mmu.eg.db")
-        HuMAN.names <- query(hub, "org.Mmu.eg.db")#org.Hs.eg.db  org.MM.eg
-        
-        
-        HuMAN <- hub[["AH75746"]] #AH75742 #query(hub, "org.MM.eg"), AH52234, AH57184.... new human AH73986? or AH70572? old? AH66156 query(hub, "org.Hs.eg.db")
-        
+        RefGenome.names <- query(hub, qrhub)#org.Hs.eg.db  org.MM.eg
         
         
-        envv$GOAnn <- list(HuMAN = HuMAN, HuMAN.names = HuMAN.names)
+        if(input$species == "mouse") qrhub.id="AH84123"
+        if(input$species == "human") qrhub.id="org.Hs.eg.db"
+        if(input$species == "rhesus") qrhub.id="org.Mmu.eg.db"
+        
+        print(RefGenome.names$ah_id)
+        RefGenome <- hub[[RefGenome.names$ah_id]] 
+        
+        
+        envv$GOAnn <- list(RefGenome = RefGenome, RefGenome.names = RefGenome.names)
         
         GO_data <- list()
         
@@ -680,17 +726,17 @@ server <- function(input, output, session) {
           envv$InfoBox_sub <- paste0("Getting GO: %", round(i/NComps,3)*100)
           
           print("...negatives")
-          GO_data[[paste0("V",i,"N")]] <- GO_enrichment(results =SDAres, i, side="N", geneNumber = 100, threshold=0.05, OrgDb =HuMAN)
+          GO_data[[paste0("V",i,"N")]] <- GO_enrichment(results =SDAres, i, side="N", geneNumber = 100, threshold=0.05, OrgDb =RefGenome)
           print("...positives")
-          GO_data[[paste0("V",i,"P")]] <- GO_enrichment(results =SDAres, i, side="P", geneNumber = 100, threshold=0.05, OrgDb =HuMAN)
+          GO_data[[paste0("V",i,"P")]] <- GO_enrichment(results =SDAres, i, side="P", geneNumber = 100, threshold=0.05, OrgDb =RefGenome)
         }
         
-        saveRDS(GO_data, paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps.rds"))
+        saveRDS(GO_data, paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))
         
       } else{
         print("Loaded previously saved GO annotations.")
         
-        GO_data <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps.rds"))
+        GO_data <- readRDS(paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))
       }
       
       envv$InfoBox_sub <- "GO data loaded"
@@ -1261,6 +1307,11 @@ server <- function(input, output, session) {
     envv$Remove_comps <- selected
     
   })
+  observeEvent(input$select_all_selection, {
+    envv$Remove_comps <- 1:as.numeric(envv$SDAres$command_arguments$num_comps)
+    
+  })
+  
   
   output$CompBatchCheckBoxSelect <- renderUI({
     
