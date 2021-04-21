@@ -481,13 +481,8 @@ server <- function(input, output, session) {
     
     if(file.exists(envv$path2SDA_dyn)) {
       
-      # loadloc = "/Volumes/Maggie/Work/OHSU/Conrad/R/MouseTestis/AmalgamSC/data/TrioDownSampAmaglam/sda_results"
-      # loadloc = "../../../Expts/TetCombo2/data/sda_results/Tet_SDADGE_DropSim_mi10000_nc40_N21509_rep1"
-      # loadloc = "../../../../Conrad/R/Utah/sda_results/Testis_Run2/TestisV2_150Kgenes_SDA_mi10000_nc50_N26093_rep1"
-      # input <- list(); envv <- list()
-      # envv$path2SDA_dyn = loadloc
-      # 
-      # updateTextInput(session, "loadSDAmsg", value = "Loading SDA")
+      print(envv$path2SDA_dyn)
+      
       envv$InfoBox_sub = "Loading SDA"
       
       
@@ -497,7 +492,7 @@ server <- function(input, output, session) {
         DimNamesPath <- paste0(dirname(envv$path2SDA_dyn), "/")
         
       }
-      # print(DimNamesPath)
+      print(DimNamesPath)
       
       
       
@@ -507,6 +502,7 @@ server <- function(input, output, session) {
         results_folder = envv$path2SDA_dyn,
         data_path =  DimNamesPath)
       
+      print("SDA results loaded")
       
       #update the names
       colnames(SDAres$scores) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
@@ -514,6 +510,8 @@ server <- function(input, output, session) {
       
       #adds some stats
       SDAres      <- AddCompStats(SDAres)
+      
+      print("CompStats added")
       
       envv$SDAres <- SDAres
       
@@ -601,8 +599,12 @@ server <- function(input, output, session) {
       
       head.path <- gsub("/", "", head.path)
       
+      print("head path:")
       print(head.path)
+      print("path2SDA_dyn:")
       print(envv$path2SDA_dyn)
+      print("base path:")
+      print(base.path)
       
       SDAres <- envv$SDAres
       
@@ -610,7 +612,7 @@ server <- function(input, output, session) {
       
       # basename("../../../../Conrad/R/Utah/sda_results/Testis_Run2")
       
-      print(paste0("lookinf for files: ", envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_", input$species, ".rds"))
+      print(paste0("looking for files: ", envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_", input$species, ".rds"))
       print(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_", input$species,".chromosome.lengths.rds"))
       print(paste0(envv$path2SDA_dyn, "/", head.path,  "_biomaRt_gene_loc_", 
                    input$species, ".rds"))
