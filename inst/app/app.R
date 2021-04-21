@@ -47,9 +47,9 @@ ui <- dashboardPage(skin="red",
                         menuItem("Batch removal", tabName = "BatchRemove", icon = icon("toolbox")),
                         menuItem("DGE Batch-Removed", tabName = "DGEsda", icon = icon("autoprefixer")),
                         menuItem("Gene Explorer", tabName = "GeneExplorer", icon = icon("dna")),
-                        menuItem("Save Out", tabName = "SaveOut", icon = icon("save"))
-                        # menuItem("Source code", icon = icon("file-code-o"), 
-                        #          href = "https://")
+                        menuItem("Save Out", tabName = "SaveOut", icon = icon("save")),
+                        menuItem("@eisamahyari", icon = icon("heart"), 
+                                 href = "https://eisascience.github.io")
                       )
                     ),
                     
@@ -709,9 +709,9 @@ server <- function(input, output, session) {
         RefGenome.names <- query(hub, qrhub)#org.Hs.eg.db  org.MM.eg
         
         
-        if(input$species == "mouse") qrhub.id="AH84123"
-        if(input$species == "human") qrhub.id="org.Hs.eg.db"
-        if(input$species == "rhesus") qrhub.id="org.Mmu.eg.db"
+        # if(input$species == "mouse") qrhub.id="AH84123"
+        # if(input$species == "human") qrhub.id="org.Hs.eg.db"
+        # if(input$species == "rhesus") qrhub.id="org.Mmu.eg.db"
         
         print(RefGenome.names$ah_id)
         RefGenome <- hub[[RefGenome.names$ah_id]] 
@@ -771,7 +771,8 @@ server <- function(input, output, session) {
         # print(nrow(SDAres$scores[,]))
         tsnepp <- round((nrow(SDAres$scores[,]) - 1)/3.2)
         tsnepp <- ifelse(tsnepp < 50, tsnepp, 50)
-        # print(tsnepp)
+        print("perplexity:")
+        print(tsnepp)
         
        
         
