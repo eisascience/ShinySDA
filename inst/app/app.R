@@ -600,6 +600,18 @@ server <- function(input, output, session) {
   ## controls how to handle pipe depending on data
   envv$Origin = "unk"
   
+  # Use the try() function to run the function and handle the error
+  result <- try(source("apik.R",local = TRUE), silent = TRUE)
+  
+  # Check if an error occurred
+  if (inherits(result, "try-error")) {
+    # either make apik.R and put your api key in it as envv$apik = "" or type it directly
+  } else {
+    # The function ran successfully. Use the result here.
+    source("apik.R",local = TRUE)
+    updateTextInput(session, "apiKey", value = isolate(envv$apik))
+  }
+  
   
   ### SDA local folder
   output$select.folder <-

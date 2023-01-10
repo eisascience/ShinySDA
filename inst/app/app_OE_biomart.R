@@ -53,7 +53,7 @@ observeEvent(input$getGeneAnn, {
       if(input$species == "rhesus") ens_ds="mmulatta_gene_ensembl"
 
       print("getting gene locations")
-      gene_locations <- get.location(gene.symbols=colnames(SDAres$loadings[[1]]),
+      gene_locations <- ShinySDA::get.location(gene.symbols=colnames(SDAres$loadings[[1]]),
                                      data_set = ens_ds,
                                      gene_name = "external_gene_name")
 
