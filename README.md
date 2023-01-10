@@ -1,6 +1,8 @@
+
+
 # ShinySDA (SiSDA)
 
-A shiny app to load, browse, and process SDA objects. 
+A sister-companion shiny app for SDA to load, browse, and process SDA objects. 
 
 The goal of this app is to make a reproducible processing framework of SDA results including QC and component selection.
 
@@ -18,8 +20,18 @@ sda_results is a folder upstream which stores or or several replicates of the sa
 
 MyExperiment is a folder upstream of sda_results. It should have a dataframe (with the right rownames) saverd as _MetaDF.rds in this folder. Also the SDA input files (the matrix file and _dimnames.rds) need to be here. 
 
+## Version Update
 
+### 1.1.0
 
+Several new tabs, figures, and features have been implemented. Briefly, 
+A) Load SDA files either directly from Prime-seq using a numerical ID or traditionally, directly from a path.
+B) Meta data for prime-seq data automatically is downloaded and loaded in or traditionally, save a data frame as an _MetaDF.rds in the path
+C) New tabs and figures.
+
+### 1.0.0
+
+Working stable release that works for loading SDA runs from a path
 
 ## Refs:
 
@@ -39,7 +51,6 @@ Stuart and Butler et al. Comprehensive integration of single cell data. bioRxiv 
 Bimber Lab:
 
 Produced by: @eisamahyari
-Converted to an R packaged by Kosiso Onwuzu.
 
 
 ## Install : 
