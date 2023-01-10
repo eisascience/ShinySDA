@@ -106,7 +106,7 @@ ui <- dashboardPage(skin="red",
                                   valueBoxOutput("InfoBox_Main", width = 6),
                                   
                                   box(textInput("apiKey", "Prime-seq API Kit", 
-                                                value ="apikey|f1d18c0b8816a552783908490badc137"),
+                                                value =""),
                                       textInput("baseURL", "baseURL", 
                                                 value ="https://prime-seq.ohsu.edu"),
                                       textInput("defaultFolder", "defPSfold", 
