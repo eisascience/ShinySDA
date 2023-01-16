@@ -79,7 +79,7 @@ observeEvent(input$getGeneAnn, {
       envv$InfoBox_sub = "Downloading Chr Lengths"
 
       print("loading SDAtools Chr Lengths")
-      GeneLoc         <- SDAtools::load_gene_locations(path = base.path,
+      GeneLoc         <- SDAtools::load_gene_locations(path = envv$path2SDA_dyn,
                                                        genes = colnames(SDAres$loadings[[1]]),
                                                        organism = ens_ds,
                                                        name="human")

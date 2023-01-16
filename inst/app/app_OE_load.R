@@ -117,6 +117,8 @@ observeEvent(input$Load_SDA_primeseq, {
                         choices = PossibleMetaVec, 
                         selected = PossibleMetaVec[1])
       
+      updateCheckboxGroupInput(session, "chkbx_MetaSave", choices = PossibleMetaVec, selected =  PossibleMetaVec[1])
+      
       
       
       #$SubjectId, $ExpID, $EXP.ID, $SampleDate, $SingleR_Labels, $BarcodePrefix

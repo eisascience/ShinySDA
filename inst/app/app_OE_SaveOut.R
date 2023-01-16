@@ -1,3 +1,61 @@
+observeEvent(input$pos_score_save, {
+  
+})
+
+observeEvent(input$neg_score_save, {
+  
+})
+
+observeEvent(input$upd_score_tabl, {
+  
+  SDAScores <- envv$SDAres$scores
+  MetaDF <- envv$MetaDF
+  
+  if(length(input$chkbx_MetaSave)>1 ){
+    Enr.ls = list()
+    Dep.ls = list()
+    for(x in input$chkbx_MetaSave){
+      StrLs = ShinySDA:::SDA_ChiSqrHMresDF(MetaDF, MetaSelect=x, SDAScores)
+      Enr.ls[[x]] = StrLs$Enr
+      Dep.ls[[x]] = StrLs$Dep
+    }
+    names(Enr.ls) = paste0("Enr_",names(Enr.ls))
+    names(Dep.ls) = paste0("Dep_",names(Dep.ls))
+    
+    # renderDataTable(mtcars$cyl*10)
+   
+    # DT::replaceData(session, "upd_score_tabl",  data.frame(cbind(as.data.frame(Enr.ls), as.data.frame(Dep.ls))),
+    #             resetPaging = TRUE)
+    paste_if_not_blank <- function(df){
+      # Create an empty vector to store the output
+      output_vector <- character(nrow(df))
+      
+      # Apply the function to each row of the dataframe
+      output_vector <- apply(df, 1, function(row){
+        # Paste the values of the row if not blank
+        return(paste(row[row != ""], collapse = " | "))
+      })
+      
+      return(output_vector)
+    }
+    
+
+    # envv$ChiSqrMeta_tabDF = data.frame(cbind(as.data.frame(Enr.ls), as.data.frame(Dep.ls)))
+    envv$ChiSqrMeta_tabDF = data.frame(Enr=paste_if_not_blank(as.data.frame(Enr.ls)), 
+               Dep=paste_if_not_blank(as.data.frame(Dep.ls)))
+    
+    print(data.frame(Enr=paste_if_not_blank(as.data.frame(Enr.ls)), 
+                     Dep=paste_if_not_blank(as.data.frame(Dep.ls))))
+    # print(head(data.frame(cbind(as.data.frame(Enr.ls), as.data.frame(Dep.ls)))))
+    
+  }
+  
+
+})
+
+
+
+
 observeEvent(input$SaveAsSerObj, {
   
   

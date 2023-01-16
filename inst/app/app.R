@@ -34,6 +34,8 @@ library(rclipboard)
 library("BiocParallel")
 register(MulticoreParam(4))
 
+library(ShinySDA)
+
 # if (Sys.getenv("SCRATCH_DIR") != "") {
 #   cachedir <- paste0(Sys.getenv("SCRATCH_DIR"), "ShinySDA-cache")
 # } else {
@@ -60,7 +62,8 @@ ui <- dashboardPage(skin="red",
                         menuItem("Folder Input", tabName = "FolderInput", icon = icon("dashboard")),
                         menuItem("PreProcessing", tabName = "PreProcess", icon = icon("dashboard")),
                         menuItem("Run QC", tabName = "QCplots", icon = icon("wrench")),
-                        menuItem("Cell-Score Heatmap-ChiSqr w/ Meta", tabName = "ChiSqrHM", icon = icon("wrench")),
+                        menuItem("Cell-Score ChiSqr Heatmap w/ Meta", tabName = "ChiSqrHM", icon = icon("wrench")),
+                        menuItem("Cell-Score ChiSqr Export w/ Meta", tabName = "ChiSqrTab", icon = icon("wrench")),
                         menuItem("Cell-score across w/ Meta", tabName = "CSplots", icon = icon("wrench")),
                         menuItem("Cell-score boxplots w/ Meta", tabName = "CSBoxPlots", icon = icon("wrench")),
                         # menuItem("Cell-score tSNE", tabName = "CStSNEPlots", icon = icon("wrench")),
@@ -350,6 +353,31 @@ ui <- dashboardPage(skin="red",
                                   )
                                 )
                         ),
+                        
+                        # ChiSqrTab ------
+                        tabItem(tabName = "ChiSqrTab",
+                                h2("ChiSqr Heatmap Enrichment of Cell-scores per Meta"),
+                                fluidRow(
+                                 
+                                  box(
+                                    title = "Select to save", status = "primary", solidHeader = TRUE,
+                                    collapsible = TRUE, background = "black",
+                                    checkboxGroupInput("chkbx_MetaSave", "Select items:", 
+                                                       c("Item 1", "Item 2", "Item 3")),
+                                    # actionButton("pos_score_save", "Save Pos Score"),
+                                    # actionButton("neg_score_save", "Save Neg Score"),
+                                    actionButton("upd_score_tabl", "Update Tables"),
+                                    
+                                  ),
+                                  box(
+                                    title = "ChiSqrRes Scores Pos cellscores", status = "primary", solidHeader = TRUE,
+                                    collapsible = TRUE,
+                                    DT::dataTableOutput("table_SDAScoresChiPos"),
+                                    width = 10, background = "black"
+                                  ),
+                                  
+                                )
+                        ),
 
 
 
@@ -358,7 +386,7 @@ ui <- dashboardPage(skin="red",
                                 h2("ChiSqr Heatmap Enrichment of Cell-scores per Meta"),
                                 fluidRow(
                                   box(
-                                    title = "Metadata Selection", status = "primary", solidHeader = TRUE,
+                                    title = "Select to plot", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE, background = "black",
                                     selectInput("Metaselect4", "Meta select:",
                                                 c("Population" = "Population",
@@ -366,6 +394,7 @@ ui <- dashboardPage(skin="red",
                                                   "SubjectId" = "SubjectId",
                                                   "Phase" = "Phase"), selected = "Population"),
                                   ),
+                                  
                                   box(
                                     title = "ChiSqrRes Scores Pos cellscores", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,
@@ -600,6 +629,10 @@ server <- function(input, output, session) {
   ## controls how to handle pipe depending on data
   envv$Origin = "unk"
   
+  ## Feature Enrichment; used in returning enrichment profile from chi sqr analysis
+  # envv$FeatEnrich$pos = list()
+  # envv$FeatEnrich$neg = list()
+
   # Use the try() function to run the function and handle the error
   result <- try(source("apik.R",local = TRUE), silent = TRUE)
   

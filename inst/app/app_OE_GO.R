@@ -25,11 +25,12 @@ observeEvent(input$getSDAGo, {
     
 
     print("starting GO")
+    envv$InfoBox_sub <- "Stating GO"
     
     SDAres <- envv$SDAres
     
-    envv$InfoBox_sub <- paste0(NComps, " comps, ~30 sec per comp")
-    
+
+
     
     print(paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))
     
@@ -57,17 +58,29 @@ observeEvent(input$getSDAGo, {
       
       envv$GOAnn <- list(RefGenome = RefGenome, RefGenome.names = RefGenome.names)
       
-      GO_data <- list()
       
-      for (i in 1:NComps){
-        print(i)
-        envv$InfoBox_sub <- paste0("Getting GO: %", round(i/NComps,3)*100)
+      if(!is.null(envv$SDAres$goEnrichment)){
         
-        print("...negatives")
-        GO_data[[paste0("V",i,"N")]] <- GO_enrichment(results =SDAres, i, side="N", geneNumber = 100, threshold=0.05, OrgDb =RefGenome)
-        print("...positives")
-        GO_data[[paste0("V",i,"P")]] <- GO_enrichment(results =SDAres, i, side="P", geneNumber = 100, threshold=0.05, OrgDb =RefGenome)
+        GO_data = envv$SDAres$goEnrichment
+        envv$InfoBox_sub <- paste0("GO was found in the SDA obj")
+        
+        
+      } else{
+        envv$InfoBox_sub <- paste0(NComps, " comps, ~30 sec per comp")
+        
+        GO_data <- list()
+        
+        for (i in 1:NComps){
+          print(i)
+          envv$InfoBox_sub <- paste0("Getting GO: %", round(i/NComps,3)*100)
+          
+          print("...negatives")
+          GO_data[[paste0("V",i,"N")]] <- GO_enrichment(results =SDAres, i, side="N", geneNumber = 100, threshold=0.05, OrgDb =RefGenome)
+          print("...positives")
+          GO_data[[paste0("V",i,"P")]] <- GO_enrichment(results =SDAres, i, side="P", geneNumber = 100, threshold=0.05, OrgDb =RefGenome)
+        }
       }
+      
       
       saveRDS(GO_data, paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))
       
