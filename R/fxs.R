@@ -1,3 +1,123 @@
+#Mcl Dev
+
+.GetCompsDF <- function(MetaDF, MetaSelect, SDAScores, direction){
+  CompsDF <- as.data.frame(lapply(levels(factor(MetaDF[,MetaSelect,drop = TRUE])), function(CondX){
+    apply(SDAScores[rownames(MetaDF)[which(MetaDF[,MetaSelect,drop = TRUE] == CondX)], ,drop = FALSE], 2,
+          function(x){
+            if (direction == 'neg'){
+              round(sum(x<0)/nrow(SDAScores)*100, 4)
+            } else if (direction == 'pos'){
+              round(sum(x>0)/nrow(SDAScores)*100, 4)
+            } else {
+              stop(paste0('Direction must be pos or neg: ', direction))
+            }
+          })
+  }))
+  
+  colnames(CompsDF) <- levels(factor(MetaDF[,MetaSelect]))
+  CompsDF[CompsDF==0] = 0.0001 #0 values produce NAs in Chisqr this is a minor adjustment
+  
+  CompsDF <- as.data.frame(CompsDF[naturalsort::naturalsort(rownames(CompsDF)),])
+  CompsDF$SDA <- factor(rownames(CompsDF), levels=rownames(CompsDF))
+  
+  return(CompsDF)
+}
+
+#' Plot SDA Results Using Chi-Square Heatmap
+#'
+#' This function plots SDA results using a chi-square heatmap.
+#'
+#' @param MetaDF A data frame containing metadata for the samples.
+#' @param MetaSelect A character string representing the metadata column to use for plotting.
+#' @param SDAScores A data frame containing the SDA scores.
+#' @return A list of two vector text of enrichments, one for pos one for neg scored cells
+#' @export
+SDA_ChiSqrHMresDF <- function(MetaDF, MetaSelect, SDAScores){
+  
+  direction = "pos"
+  
+  CompsDF = .GetCompsDF(MetaDF, MetaSelect, SDAScores, direction=direction)
+  
+  
+  ChiT <- chisq.test(CompsDF[,1:(ncol(CompsDF)-1)])
+  
+  ChiTres <- ChiT$residuals
+  ChiTres[which(is.na(ChiTres))] = 0
+
+  ChiTres.pos = ChiTres
+  ChiTres.pos[ChiTres.pos<1] = 0 
+  nonzero_positions.pos <- which(ChiTres.pos != 0, arr.ind = TRUE)
+  table.pos <- ChiTres.pos
+  table.pos[nonzero_positions.pos] <- colnames(ChiTres.pos)[nonzero_positions.pos[,2]]
+  
+  
+  OutVec.pos = apply(table.pos, 1, function(x) {
+    y = paste(x[x != "0"], collapse = ", ") 
+    ifelse(y=="", y, paste0("E4 ", y))
+  })
+  
+  ChiTres.pos = ChiTres
+  ChiTres.pos[ChiTres.pos>-1] = 0 
+  nonzero_positions.pos <- which(ChiTres.pos != 0, arr.ind = TRUE)
+  table.pos <- ChiTres.pos
+  table.pos[nonzero_positions.pos] <- colnames(ChiTres.pos)[nonzero_positions.pos[,2]]
+  
+  OutVec.pos = paste0(OutVec.pos, " | ",  apply(table.pos, 1, function(x) {
+    y = paste(x[x != "0"], collapse = ", ") 
+    ifelse(y=="", y, paste0("D4 ", y))
+  })) 
+  OutVec.pos[OutVec.pos ==" | "] = ""
+  
+  
+  
+  
+  
+  
+  direction = "neg"
+  
+  CompsDF = .GetCompsDF(MetaDF, MetaSelect, SDAScores, direction=direction)
+  
+  
+  ChiT <- chisq.test(CompsDF[,1:(ncol(CompsDF)-1)])
+  
+  ChiTres <- ChiT$residuals
+  ChiTres[which(is.na(ChiTres))] = 0
+  
+  ChiTres.neg = ChiTres
+  ChiTres.neg[ChiTres.neg<1] = 0 
+  nonzero_negitions.neg <- which(ChiTres.neg != 0, arr.ind = TRUE)
+  table.neg <- ChiTres.neg
+  table.neg[nonzero_negitions.neg] <- colnames(ChiTres.neg)[nonzero_negitions.neg[,2]]
+  
+  
+  OutVec.neg = apply(table.neg, 1, function(x) {
+    y = paste(x[x != "0"], collapse = ", ") 
+    ifelse(y=="", y, paste0("E4 ", y))
+  })
+  
+  ChiTres.neg = ChiTres
+  ChiTres.neg[ChiTres.neg>-1] = 0 
+  nonzero_negitions.neg <- which(ChiTres.neg != 0, arr.ind = TRUE)
+  table.neg <- ChiTres.neg
+  table.neg[nonzero_negitions.neg] <- colnames(ChiTres.neg)[nonzero_negitions.neg[,2]]
+  
+  OutVec.neg = paste0(OutVec.neg, " | ",  apply(table.neg, 1, function(x) {
+    y = paste(x[x != "0"], collapse = ", ") 
+    ifelse(y=="", y, paste0("D4 ", y))
+  })) 
+  OutVec.neg[OutVec.neg ==" | "] = ""
+  
+  
+  
+  
+return(list(Pos=OutVec.pos,
+            Neg=OutVec.neg 
+            ))
+}
+
+
+
+
 
 
 # Plots ----------
@@ -154,6 +274,8 @@ Plot_CorSDA_Loadings <- function(SDAres = NULL) {
 
 
 
+
+
 #' Plot SDA Results Using Chi-Square Heatmap
 #'
 #' This function plots SDA results using a chi-square heatmap.
@@ -167,26 +289,7 @@ Plot_CorSDA_Loadings <- function(SDAres = NULL) {
 #' @export
 plot_SDA_ChiSqrHM <- function(MetaDF, MetaSelect, SDAScores, direction, clustStat = T){
   
-  
-  # if(direction == "pos"){
-  #   CompsDF <- as.data.frame(lapply(levels(factor(MetaDF[,MetaSelect])), function(CondX){
-  #     
-  #     apply(SDAScores[rownames(MetaDF)[which(MetaDF[,MetaSelect] == CondX)], ], 2, 
-  #           function(x){
-  #             round(sum(x>0)/nrow(SDAScores)*100, 2)
-  #           })
-  #   })); 
-  # }
-  # if(direction == "neg"){
-  #   CompsDF <- as.data.frame(lapply(levels(factor(MetaDF[,MetaSelect])), function(CondX){
-  #     
-  #     apply(SDAScores[rownames(MetaDF)[which(MetaDF[,MetaSelect] == CondX)], ], 2, 
-  #           function(x){
-  #             round(sum(x<0)/nrow(SDAScores)*100, 2)
-  #           })
-  #   })); 
-  # }
-  
+
   CompsDF <- as.data.frame(lapply(levels(factor(MetaDF[,MetaSelect,drop = TRUE])), function(CondX){
     apply(SDAScores[rownames(MetaDF)[which(MetaDF[,MetaSelect,drop = TRUE] == CondX)], ,drop = FALSE], 2,
           function(x){
@@ -217,19 +320,17 @@ plot_SDA_ChiSqrHM <- function(MetaDF, MetaSelect, SDAScores, direction, clustSta
   ChiResSD[which(is.na(ChiResSD))] <- 0
   ChiResSD[ChiResSD < 0.2] <- ""
   
-  # if(is.null(envv$SDAScoresChi_clusBTN)) {
-  #   clustStat = F
-  # } else {
-  #   clustStat <- ifelse(envv$SDAScoresChi_clusBTN=="ON", T, F)
-  # }
-  
-  
-  pheatmap::pheatmap((t(ChiT$residuals)),
+ 
+  pheatmap::pheatmap((t(ChiTres)),
                      cluster_cols = clustStat, cluster_rows = clustStat,
                      color = colorRampPalette(rev(brewer.pal(n = 7, name ="RdBu")))(10), 
                      labels_col = paste0(rownames(CompsDF), " sd_", ChiResSD)
   )
+  
+  
 }
+
+
 
 
 

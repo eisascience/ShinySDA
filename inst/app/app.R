@@ -373,7 +373,7 @@ ui <- dashboardPage(skin="red",
                                     title = "ChiSqrRes Scores Pos cellscores", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,
                                     DT::dataTableOutput("table_SDAScoresChiPos"),
-                                    width = 10, background = "black"
+                                    width = 10, background = "light-blue"
                                   ),
                                   
                                 )

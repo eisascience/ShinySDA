@@ -12,20 +12,21 @@ observeEvent(input$upd_score_tabl, {
   MetaDF <- envv$MetaDF
   
   if(length(input$chkbx_MetaSave)>1 ){
-    Enr.ls = list()
-    Dep.ls = list()
+    Pos.ls = list()
+    Neg.ls = list()
     for(x in input$chkbx_MetaSave){
       StrLs = ShinySDA:::SDA_ChiSqrHMresDF(MetaDF, MetaSelect=x, SDAScores)
-      Enr.ls[[x]] = StrLs$Enr
-      Dep.ls[[x]] = StrLs$Dep
+      Pos.ls[[x]] = StrLs$Pos
+      Neg.ls[[x]] = StrLs$Neg
     }
-    names(Enr.ls) = paste0("Enr_",names(Enr.ls))
-    names(Dep.ls) = paste0("Dep_",names(Dep.ls))
+    # names(Pos.ls) = paste0("Pos_",names(Pos.ls))
+    # names(Neg.ls) = paste0("Neg_",names(Neg.ls))
     
     # renderDataTable(mtcars$cyl*10)
    
-    # DT::replaceData(session, "upd_score_tabl",  data.frame(cbind(as.data.frame(Enr.ls), as.data.frame(Dep.ls))),
+    # DT::replaceData(session, "upd_score_tabl",  data.frame(cbind(as.data.frame(Pos.ls), as.data.frame(Neg.ls))),
     #             resetPaging = TRUE)
+    
     paste_if_not_blank <- function(df){
       # Create an empty vector to store the output
       output_vector <- character(nrow(df))
@@ -40,13 +41,13 @@ observeEvent(input$upd_score_tabl, {
     }
     
 
-    # envv$ChiSqrMeta_tabDF = data.frame(cbind(as.data.frame(Enr.ls), as.data.frame(Dep.ls)))
-    envv$ChiSqrMeta_tabDF = data.frame(Enr=paste_if_not_blank(as.data.frame(Enr.ls)), 
-               Dep=paste_if_not_blank(as.data.frame(Dep.ls)))
+    # envv$ChiSqrMeta_tabDF = data.frame(cbind(as.data.frame(Pos.ls), as.data.frame(Neg.ls)))
+    envv$ChiSqrMeta_tabDF = data.frame(Pos=paste_if_not_blank(as.data.frame(Pos.ls)), 
+               Neg=paste_if_not_blank(as.data.frame(Neg.ls)))
     
-    print(data.frame(Enr=paste_if_not_blank(as.data.frame(Enr.ls)), 
-                     Dep=paste_if_not_blank(as.data.frame(Dep.ls))))
-    # print(head(data.frame(cbind(as.data.frame(Enr.ls), as.data.frame(Dep.ls)))))
+    # print(data.frame(Pos=paste_if_not_blank(as.data.frame(Pos.ls)), 
+    #                  Neg=paste_if_not_blank(as.data.frame(Neg.ls))))
+    # print(head(data.frame(cbind(as.data.frame(Pos.ls), as.data.frame(Neg.ls)))))
     
   }
   
