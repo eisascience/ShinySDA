@@ -134,6 +134,8 @@ ui <- dashboardPage(skin="red",
                                           style = "float: left;",
                                           actionButton("Download_SDA_primeseq", "Download SDA Obj"),
                                           actionButton("Load_SDA_primeseq", "Load SDA Obj"),
+                                          actionButton("Down_N_Load_SDA", "** Download & Load **"),
+                                          
                                           
                                         ),
                                         # column(
@@ -184,6 +186,8 @@ ui <- dashboardPage(skin="red",
                                       actionButton("getSDAGo", "2. Get SDA GO Enrichments"),
                                       actionButton("runtSNE", "3. Run tSNE (cs-all)"),
                                       actionButton("runtSNEQCfilt", "4.5 Run tSNE (cs-qc)"),
+                                      actionButton("runAllProc", "** Run all **"),
+                                      
                                       # textInput("loadSDAmsg", "File Status", "not loaded"),
                                       width = 10
                                       #fileInput("SDAin", "Browse")

@@ -551,9 +551,15 @@ output$GOpos <- renderPlot({
   } else {
     GO_data  <- envv$GO_data
     zN = envv$QC_compIter
-    go_volcano_plot(x=GO_data, 
-                    component = paste("V", zN, "P", sep=""))+ 
-      theme_bw()+ theme(aspect.ratio = 1)
+    if(any(grepl("Pos", names(envv$GO_data)))){
+      ShinySDA::go_volcano_plot(x=envv$GO_data, component = paste(zN, "-Pos", sep=""))+ 
+        theme_bw()+ theme(aspect.ratio = 1)
+    } else {
+      if(any(grepl("V", names(envv$GO_data)))){
+        ShinySDA::go_volcano_plot(x=envv$GO_data, component = paste("V", zN, "P", sep=""))+ 
+          theme_bw()+ theme(aspect.ratio = 1)
+      }
+    }
     
   }
   
@@ -569,8 +575,16 @@ output$GOneg <- renderPlot({
   } else {
     GO_data  <- envv$GO_data
     zN = envv$QC_compIter
-    go_volcano_plot(x=GO_data, component = paste("V", zN, "N", sep=""))+ 
-      theme_bw()+ theme(aspect.ratio = 1)
+    
+    if(any(grepl("Neg", names(envv$GO_data)))){
+      ShinySDA::go_volcano_plot(x=envv$GO_data, component = paste(zN, "-Neg", sep=""))+ 
+        theme_bw()+ theme(aspect.ratio = 1)
+    } else {
+      if(any(grepl("V", names(envv$GO_data)))){
+        ShinySDA::go_volcano_plot(x=envv$GO_data, component = paste("V", zN, "N", sep=""))+ 
+          theme_bw()+ theme(aspect.ratio = 1)
+      }
+    }
     
   }
   
