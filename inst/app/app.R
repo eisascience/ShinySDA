@@ -66,6 +66,7 @@ ui <- dashboardPage(skin="red",
                         menuItem("Cell-Score ChiSqr Export w/ Meta", tabName = "ChiSqrTab", icon = icon("wrench")),
                         menuItem("Cell-score across w/ Meta", tabName = "CSplots", icon = icon("wrench")),
                         menuItem("Cell-score boxplots w/ Meta", tabName = "CSBoxPlots", icon = icon("wrench")),
+                        menuItem("Cell-score paired scatter w/ Meta", tabName = "CSScatter", icon = icon("wrench")),
                         # menuItem("Cell-score tSNE", tabName = "CStSNEPlots", icon = icon("wrench")),
                         menuItem("Gene-loading Cor HM", tabName = "GL_cor_HM", icon = icon("wrench")),
                         menuItem("Batch removal", tabName = "BatchRemove", icon = icon("toolbox")),
@@ -310,6 +311,14 @@ ui <- dashboardPage(skin="red",
                                     width = 10,
                                     background = "black"
                                   )
+                                )
+                        ),
+                        
+                        # Cell-score paired-------
+                        tabItem(tabName = "CSScatter",
+                                h2("Cell Score Box Plots, scaled to mean = 0"),
+                                fluidRow(
+                                  
                                 )
                         ),
 

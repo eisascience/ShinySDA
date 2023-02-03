@@ -465,7 +465,6 @@ Run_GO_evv <- function(envv, input){
           GO_data[[paste0("V",i,"P")]] <- GO_enrichment(results =SDAres, i, side="P", geneNumber = 100, threshold=0.05, OrgDb =RefGenome)
         }
       }
-      s
       
       saveRDS(GO_data, paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))
       
