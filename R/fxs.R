@@ -62,9 +62,14 @@ if(file.exists(envv$path2SDA_dyn)) {
   envv = preprocess_SDA(SDAres = envv$SDAres, QuantThr = 0.95, envv = envv,
                         TopN = 150, MetaDF = NULL)
   
+  envv$Ncomp = ncol(SDAres$scores)
+  envv$Ncell = nrow(SDAres$scores)
+  envv$Ngene = ncol(SDAres$loadings[[1]]) 
   
   
-  envv$InfoBox_sub = "Load and pre-processing complete on Prime-seq sourced sda"
+  envv$InfoBox_sub = paste0("Load and pre-processing complete\n",
+                            "Ncomp: ", envv$Ncomp, " Ncells: ", envv$Ncell, " Ngenes: ", envv$Ngene)
+  
   
 } else { 
   # updateTextInput(session, "loadSDAmsg", value = "File not found")
@@ -227,6 +232,10 @@ if(!is.null(envv$sda_path)){
   print(envv$sda_path)
   SDAres = readRDS(envv$sda_path)
   
+
+  
+
+  
   if(!is.null(envv$sda_dims_path)){
     NamesDimsDF = readRDS(envv$sda_dims_path)
     rownames(SDAres$scores) <- NamesDimsDF[[1]]
@@ -240,6 +249,7 @@ if(!is.null(envv$sda_path)){
     
     envv = ShinySDA:::Run_MetaDF_evv(envv, input, session)
   }
+  
   
   
   # print(head(MetaDF))
@@ -257,9 +267,14 @@ if(!is.null(envv$sda_path)){
                                   envv = envv,
                                   TopN = 150, MetaDF = NULL)
   
+
+  envv$Ncomp = ncol(SDAres$scores)
+  envv$Ncell = nrow(SDAres$scores)
+  envv$Ngene = ncol(SDAres$loadings[[1]])
+ 
   
-  
-  envv$InfoBox_sub = "Load and pre-processing complete on Prime-seq sourced sda"
+  envv$InfoBox_sub = paste0("Load and pre-processing complete\n",
+                            "Ncomp: ", envv$Ncomp, " Ncells: ", envv$Ncell, " Ngenes: ", envv$Ngene)
   
 }
   
