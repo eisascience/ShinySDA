@@ -217,6 +217,13 @@ ui <- dashboardPage(skin="red",
                         tabItem(tabName = "QCplots",
                                 h2("Full QC plots content"),
                                 fluidRow(
+                                  
+                                  box(
+                                    title = "Kurtosis", status = "primary", solidHeader = TRUE,
+                                    collapsible = TRUE,
+                                    plotOutput("KurtosisPlot"), 
+                                    width = 10, background = "black"
+                                  ),
                                   box(
                                     title = "QC1", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,

@@ -4,17 +4,9 @@
 \alias{preprocess_SDA}
 \title{Preprocess SDA Results}
 \usage{
-preprocess_SDA(
-  SDAres = NULL,
-  QuantThr = 0.95,
-  envv = NULL,
-  TopN = 150,
-  MetaDF = NULL
-)
+preprocess_SDA(QuantThr = 0.95, envv = NULL, TopN = 150, MetaDF = NULL)
 }
 \arguments{
-\item{SDAres}{A data frame containing the SDA results.}
-
 \item{QuantThr}{A numeric value between 0 and 1 representing the quantile threshold for filtering the data.}
 
 \item{envv}{An environment or list containing the data used in the SDA analysis.}

@@ -40,7 +40,7 @@ if(file.exists(envv$path2SDA_dyn)) {
   rownames(SDAres$loadings[[1]]) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
   
   if(file.exists(paste0(envv$path2SDA_dyn, "_dimnames.rds"))){
-    print(head(NamesDimsDF))
+    # print(head(NamesDimsDF))
     NamesDimsDF = readRDS(paste0(envv$path2SDA_dyn, "_dimnames.rds"))
     rownames(SDAres$scores) <- NamesDimsDF[[1]]
     colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
@@ -59,7 +59,7 @@ if(file.exists(envv$path2SDA_dyn)) {
   # envv$SDAres <- SDAres
   
   
-  envv = preprocess_SDA(SDAres = envv$SDAres, QuantThr = 0.95, envv = envv,
+  envv = preprocess_SDA(QuantThr = 0.95, envv = envv,
                         TopN = 150, MetaDF = NULL)
   
   envv$Ncomp = ncol(SDAres$scores)
@@ -256,16 +256,17 @@ if(!is.null(envv$sda_path)){
   
   # envv$InfoBox_sub = "Load from Prime-seq completed, starting pre-processing"
   #adds some stats
-  envv$SDAres      <- ShinySDA::AddCompStats(SDAres)
+  envv$SDAres  <- ShinySDA::AddCompStats(SDAres)
   
   # print("CompStats added")
   
   # envv$SDAres <- SDAres
 
-  envv = ShinySDA::preprocess_SDA(SDAres = envv$SDAres, 
-                                  QuantThr = 0.95, 
+  envv <- ShinySDA::preprocess_SDA(QuantThr = 0.95, 
                                   envv = envv,
                                   TopN = 150, MetaDF = NULL)
+  print(envv$FailingFilters)
+  
   
 
   envv$Ncomp = ncol(SDAres$scores)
@@ -1236,15 +1237,13 @@ download_SDA_dimnames <- function(outf = NULL, outFileID = NULL){
 #'
 #' This function preprocesses SDA results by filtering and summarizing the data.
 #'
-#' @param SDAres A data frame containing the SDA results.
 #' @param QuantThr A numeric value between 0 and 1 representing the quantile threshold for filtering the data.
 #' @param envv An environment or list containing the data used in the SDA analysis.
 #' @param TopN An integer value representing the number of top features to retain.
 #' @param MetaDF A data frame containing metadata for the samples.
 #' @return A list containing the filtered and summarized SDA results.
 #' @export
-preprocess_SDA <- function(SDAres = NULL, 
-                           QuantThr = 0.95,
+preprocess_SDA <- function(QuantThr = 0.95,
                            envv = NULL,
                            TopN = 150,
                            MetaDF = NULL
@@ -1252,32 +1251,45 @@ preprocess_SDA <- function(SDAres = NULL,
   
   envv$TopN <- TopN
   
+
+  envv$SDAres = CalculateFilters(envv$SDAres, threshold = 100, plot = F, quantThr = QuantThr)
+  envv$MaxScore.thr = envv$SDAres$MaxScore.thr
+    
+  envv$QC_components  <- envv$SDAres$component_statistics[!envv$SDAres$FailingFilters,]
   
-  # some stats
-  envv$MaxScore.thr <- quantile(SDAres$component_statistics$max_score, c(QuantThr))
-  envv$QC_components  <- SDAres$component_statistics[SDAres$component_statistics$max_score<envv$MaxScore.thr,]
   envv$QC_components  <- envv$QC_components[order(envv$QC_components$Component), ]$Component
   
+  
+  # envv$FailingKertosis  <- envv$SDAres$FailingKertosis 
+  # envv$FailScoreThreshold  <- envv$SDAres$FailScoreThreshold 
+  # envv$FailingMaxScore  <- envv$SDAres$FailingMaxScore 
+  # envv$FailingFilters  <- envv$SDAres$FailingFilters 
+  
+
+
   envv$QC_compIter <- min(as.numeric(envv$QC_components))
   
-  envv$NComps <- as.numeric(SDAres$command_arguments$num_comps)
+  envv$NComps <- as.numeric(envv$SDAres$command_arguments$num_comps)
+  
+  
   
   
   
   #top loaded genes
   SDA_TopNpos <- (as.data.frame(lapply(1:envv$NComps, function(xN){
-    as.data.frame(print_gene_list(results = SDAres, i=xN, PosOnly = T, NegOnly = F, TopN = TopN))[1:TopN,1]
+    as.data.frame(print_gene_list(results = envv$SDAres, i=xN, PosOnly = T, NegOnly = F, TopN = TopN))[1:TopN,1]
   })))
   colnames(SDA_TopNpos) <- paste0("SDAV", 1:envv$NComps)
   
   SDA_TopNneg <- (as.data.frame(lapply(1:envv$NComps, function(xN){
-    as.data.frame(print_gene_list(results = SDAres, i=xN, PosOnly = F, NegOnly = T, TopN = TopN))[1:TopN,1]
+    as.data.frame(print_gene_list(results = envv$SDAres, i=xN, PosOnly = F, NegOnly = T, TopN = TopN))[1:TopN,1]
   })))
   colnames(SDA_TopNneg) <- paste0("SDAV", 1:envv$NComps)
   
   envv$SDA_TopNpos <- SDA_TopNpos
   envv$SDA_TopNneg <- SDA_TopNneg
   
+ 
   
   if(!is.null(MetaDF)){
     envv$InfoBox_sub = "SDA & Meta Loaded"
@@ -1291,7 +1303,56 @@ preprocess_SDA <- function(SDAres = NULL,
 }
 
 
+#' Add Component Statistics to SDA object
+#'
+#' This function adds component statistics to SDA results.
+#'
+#' @param SDAres SDA results obj
+#' @param threshold A threshold
+#' @return kurtosis analysis
+#' @export
+CalculateFilters <- function(SDAres, threshold = 100, plot = T, quantThr = 0.95) {
+  kurtosis_df <- data.frame()
+  s <- SDAres$scores
+  for (colIdx in 1:ncol(s)){
+    kurtosis <- moments::kurtosis(s[,colIdx])
+    #print(Seurat::FeaturePlot(seuratObj, features = sda_component) + ggtitle(kurtosis) + scale_color_gradientn(colors = c("navy", "dodgerblue2", "gold", "red")))
+    failScore <- all(s[,colIdx] < -0.5) || all(s[,colIdx] > 0.5)
+    # print(failScore)
 
+    kurtosis_df <- rbind(kurtosis_df, data.frame(sda_component = colIdx, kurtosis = kurtosis, failScore = failScore))
+  }
+  
+  kurtosis_df$passing <- kurtosis_df$kurtosis < threshold
+  kurtosis_df$sda_component <- naturalsort::naturalfactor(kurtosis_df$sda_component)
+  
+  SDAres$kertosis <- kurtosis_df$kurtosis
+  SDAres$FailingKertosis <- SDAres$kertosis > threshold
+  
+  SDAres$FailScoreThreshold <- kurtosis_df$failScore
+  
+  SDAres$MaxScore.thr <- quantile(SDAres$component_statistics$max_score, c(quantThr))
+  SDAres$FailingMaxScore <- SDAres$component_statistics$max_score > SDAres$MaxScore.thr
+  
+  SDAres$FailingFilters <- SDAres$FailingKertosis | SDAres$FailScoreThreshold | SDAres$FailingMaxScore 
+  
+  
+  
+  
+   if(plot) {
+     ggplot(kurtosis_df, aes(x = sda_component, y = kurtosis, color = passing)) + 
+          geom_point() + 
+          geom_segment( aes(x=sda_component, xend=sda_component, y=0, yend=kurtosis)) + 
+          geom_hline(yintercept = threshold, color = 'red', linetype = 'dashed') +
+          egg::theme_article() + 
+          theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1)) + xlab("SDA Comps")
+   } else {
+       
+     return(SDAres)
+     }
+  
+  
+}
 
 #' Add Component Statistics to SDA object
 #'

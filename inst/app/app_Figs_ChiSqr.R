@@ -5,8 +5,17 @@ output$table_SDAScoresChiPos <- DT::renderDataTable({
 
   if(!is.null(envv$ChiSqrMeta_tabDF)){
     envv$ChiSqrMeta_tabDF = as.data.frame(envv$ChiSqrMeta_tabDF)
+    # print(envv$ChiSqrMeta_tabDF)
+    print(nrow(envv$ChiSqrMeta_tabDF))
+    # print(length(ifelse(envv$FailingKertosis, "fail", "pass")))
+    envv$ChiSqrMeta_tabDF$Kertosis = ifelse(envv$SDAres$FailingKertosis, "fail", "pass")
+    envv$ChiSqrMeta_tabDF$ScoreThreshold = ifelse(envv$SDAres$FailScoreThreshold, "fail", "pass")
+    envv$ChiSqrMeta_tabDF$MaxScore = ifelse(envv$SDAres$FailingMaxScore, "fail", "pass")
+    envv$ChiSqrMeta_tabDF$FinalCall = ifelse(envv$SDAres$FailingFilters, "fail", "pass")
+    
+      
   } else {
-    envv$ChiSqrMeta_tabDF = data.frame(A1=c("", "", ""), A2=c("", "", ""))
+    envv$ChiSqrMeta_tabDF = data.frame(A1=c("", "", "","", "", ""), A2=c("", "", "","", "", ""))
   }
   
   
@@ -23,11 +32,10 @@ output$table_SDAScoresChiPos <- DT::renderDataTable({
     base.path <- ""
     #TODO simplify?
   }
-  
-  # print(head(envv$ChiSqrMeta_tabDF))
+
   DT::datatable(envv$ChiSqrMeta_tabDF, 
                 extensions = "Buttons", 
-            options = list(pageLength = 30, #
+            options = list(pageLength = nrow(envv$ChiSqrMeta_tabDF), #
                            order = list(list(0, 'asc')), #
                            lengthChange = F,
                            autoWidth = T, #
@@ -41,7 +49,7 @@ output$table_SDAScoresChiPos <- DT::renderDataTable({
                            dom = 'Bfrtip',
                            buttons = c('copy', 'csv', 'excel', 'pdf'),
                            pageLength=5, 
-                           lengthMenu=c(3,5,10) )) %>% DT::formatStyle(columns = c(1,2,3), fontSize = '10px')
+                           lengthMenu=c(3,5,10) )) %>% DT::formatStyle(columns = c(1:6), fontSize = '10px')
    
   # DT::datatable(envv$ChiSqrMeta_tabDF,
   #               options = list(pageLength = 30, #searching = F, lengthChange = F,

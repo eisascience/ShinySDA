@@ -15,7 +15,6 @@ observeEvent(input$Down_N_Load_SDA, {
   envv = ShinySDA:::Run_DowLoadSDA_evv(envv, input)
   envv = ShinySDA:::Run_LoadSDA_evv(envv, input, session)
   
-  
 })
 
 

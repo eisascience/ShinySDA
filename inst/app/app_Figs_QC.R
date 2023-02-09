@@ -1,3 +1,20 @@
+
+
+output$KurtosisPlot <- renderPlot({
+  if(is.null(envv$SDAres)){
+    plot(x=0, y=0, main="Load an SDA")
+  } else {
+    SDAres <- envv$SDAres
+    
+    ShinySDA:::CalculateFilters(SDAres, threshold = 100, plot = T) 
+    
+    
+  }
+  
+  
+})
+
+
 output$SDAqcMaxScorefilt <- renderPlot({
   if(is.null(envv$SDAres)){
     plot(x=0, y=0, main="Load an SDA")
@@ -8,7 +25,7 @@ output$SDAqcMaxScorefilt <- renderPlot({
     MaxScore.thr9 <- quantile(SDAres$component_statistics$max_score, c(.9))
     MaxScore.thr75 <- quantile(SDAres$component_statistics$max_score, c(.75))
     
-    sum(SDAres$component_statistics$max_score > MaxScore.thr)
+    # sum(SDAres$component_statistics$max_score > MaxScore.thr)
     
     ggplot(SDAres$component_statistics, aes(y=max_score)) + geom_boxplot(outlier.colour="red", outlier.shape=8,
                                                                          outlier.size = 2) + 
@@ -30,8 +47,20 @@ output$SDAqc1 <- renderPlot({
     plot(x=0, y=0, main="Load an SDA")
   } else {
     SDAres <- envv$SDAres
-    ggplot(SDAres$component_statistics, aes(max_score, max_loading,
-                                            label = Component_name_plot)) +
+
+   compStats = as.data.frame(SDAres$component_statistics)
+   rownames(compStats) = compStats$Component_name
+    
+    
+    compStats = compStats[naturalsort::naturalsort(compStats$Component_name, decreasing = F), ]
+
+    compStats$FailingFilters = ifelse(envv$SDAres$FailingFilters, "fail", "pass")
+    
+
+    
+    
+    ggplot(compStats, aes(max_score, max_loading,
+                                            label = Component_name_plot, col=FailingFilters)) +
       geom_point() + geom_label_repel() + theme_bw()+ ggtitle("")}
   
   
@@ -42,8 +71,17 @@ output$SDAqc2 <- renderPlot({
     plot(x=0, y=0, main="Load an SDA")
   } else {
     SDAres <- envv$SDAres
-    ggplot(SDAres$component_statistics, aes(max_score, mean_score,
-                                            label = Component_name_plot)) +
+    
+    compStats = as.data.frame(SDAres$component_statistics)
+    rownames(compStats) = compStats$Component_name
+    
+    
+    compStats = compStats[naturalsort::naturalsort(compStats$Component_name, decreasing = F), ]
+    
+    compStats$FailingFilters = ifelse(envv$SDAres$FailingFilters, "fail", "pass")
+    
+    ggplot(compStats, aes(max_score, mean_score,
+                                            label = Component_name_plot, col=FailingFilters)) +
       geom_point() + geom_label_repel() + theme_bw()+ ggtitle("")}
   
   
@@ -54,8 +92,17 @@ output$SDAqc3 <- renderPlot({
     plot(x=0, y=0, main="Load an SDA")
   } else {
     SDAres <- envv$SDAres
-    ggplot(SDAres$component_statistics, aes(mean_score, mean_loading,
-                                            label = Component_name_plot)) +
+    
+    compStats = as.data.frame(SDAres$component_statistics)
+    rownames(compStats) = compStats$Component_name
+    
+    
+    compStats = compStats[naturalsort::naturalsort(compStats$Component_name, decreasing = F), ]
+    
+    compStats$FailingFilters = ifelse(envv$SDAres$FailingFilters, "fail", "pass")
+    
+    ggplot(compStats, aes(mean_score, mean_loading,
+                                            label = Component_name_plot, col=FailingFilters)) +
       geom_point() + geom_label_repel() + theme_bw() + ggtitle("")}
   
   
@@ -66,8 +113,17 @@ output$SDAqc4 <- renderPlot({
     plot(x=0, y=0, main="Load an SDA")
   } else {
     SDAres <- envv$SDAres
-    ggplot(SDAres$component_statistics, aes(sd_score, sd_loading,
-                                            label = Component_name_plot)) +
+    
+    compStats = as.data.frame(SDAres$component_statistics)
+    rownames(compStats) = compStats$Component_name
+    
+    
+    compStats = compStats[naturalsort::naturalsort(compStats$Component_name, decreasing = F), ]
+    
+    compStats$FailingFilters = ifelse(envv$SDAres$FailingFilters, "fail", "pass")
+    
+    ggplot(compStats, aes(sd_score, sd_loading,
+                                            label = Component_name_plot, col=FailingFilters)) +
       geom_point() + geom_label_repel() + theme_bw()}
   
   
@@ -78,8 +134,17 @@ output$SDAqc5 <- renderPlot({
     plot(x=0, y=0, main="Load an SDA")
   } else {
     SDAres <- envv$SDAres
-    ggplot(SDAres$component_statistics, aes(ssqrd_score, ssqrd_loading,
-                                            label = Component_name_plot)) +
+    
+    compStats = as.data.frame(SDAres$component_statistics)
+    rownames(compStats) = compStats$Component_name
+    
+    
+    compStats = compStats[naturalsort::naturalsort(compStats$Component_name, decreasing = F), ]
+    
+    compStats$FailingFilters = ifelse(envv$SDAres$FailingFilters, "fail", "pass")
+    
+    ggplot(compStats, aes(ssqrd_score, ssqrd_loading,
+                                            label = Component_name_plot, col=FailingFilters)) +
       geom_point() + geom_label_repel() + theme_bw() + ggtitle("")
   }
   
@@ -92,8 +157,16 @@ output$SDAqc6 <- renderPlot({
   } else {
     SDAres <- envv$SDAres
     
-    ggplot(SDAres$component_statistics, aes(max_loading, mean_loading,
-                                            label = Component_name_plot)) +
+    compStats = as.data.frame(SDAres$component_statistics)
+    rownames(compStats) = compStats$Component_name
+    
+    
+    compStats = compStats[naturalsort::naturalsort(compStats$Component_name, decreasing = F), ]
+    
+    compStats$FailingFilters = ifelse(envv$SDAres$FailingFilters, "fail", "pass")
+    
+    ggplot(compStats, aes(max_loading, mean_loading,
+                                            label = Component_name_plot, col=FailingFilters)) +
       geom_point() + geom_label_repel() + theme_bw() + ggtitle("")
   }
   
