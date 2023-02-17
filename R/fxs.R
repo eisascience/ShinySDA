@@ -151,8 +151,10 @@ PossibleMetaVec = c("SampleDate", "SubjectId", "ExpID",
                     "blueprint.label", "blueprint.label.fine",
                     "predicted_labels", "majority_voting",
                     "Phase", "BarcodePrefix", "DatasetId",
-                    "Population", "WorkbookId",
-                    "RNA_snn_res.0.2", "RNA_snn_res.0.6", "RNA_snn_res.1.2")
+                    "Population", "WorkbookId", "Tissue", 
+                    "Stim", "cDNA_ID", "scDblFinder.class", "orig.ident",
+                    "Submission", "SRR",
+                    "RNA_snn_res.0.2", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2")
 
 PossibleMetaVec = PossibleMetaVec[PossibleMetaVec %in% colnames(MetaDF)]
 
@@ -1086,32 +1088,36 @@ plotEnrich <- function(GeneSetsDF, GeneVec, plotTitle="", xLab="", N = NULL, k =
     
   }
   
-  if(BiPlot) print(ggplot(data=tDF, aes(x=x, y=y, label = ifelse(y < 0.01, "*", ""))) + theme_bw()  +
-                     geom_point() + geom_line() +
-                     theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-                     geom_text(vjust = 0) +
-                     ggtitle(plotTitle) +
-                     xlab("Fold-enrichment") +
-                     ylab("1 - P-value = 1 - P(X>=x) = P(X<x)"))
-  
-  tDF <- data.frame(x=factor(names(fold.enrichment), levels = names(fold.enrichment)),
-                    y=fold.enrichment,
-                    p=p.value)
-  
-  rownames(tDF) <- names(fold.enrichment)
-  
-  
-  
-  print(ggplot(data=tDF, aes(x=x, y=y, label = ifelse(p < 0.01, "*", ""))) + theme_bw()  +
-          geom_bar(stat="identity") +
-          theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
-          geom_text(vjust = 0) + 
-          ggtitle(plotTitle) + 
-          xlab(xLab) + 
-          ylab("Fold-enrichment"))
-  
-  
-  if(ReturnPval) return(1-p.value)
+  if(ReturnPval) {
+    return(1-p.value)
+  } else {
+    if(BiPlot) {
+      print(ggplot(data=tDF, aes(x=x, y=y, label = ifelse(y < 0.01, "*", ""))) + theme_bw()  +
+              geom_point() + geom_line() +
+              theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+              geom_text(vjust = 0) +
+              ggtitle(plotTitle) +
+              xlab("Fold-enrichment") +
+              ylab("1 - P-value = 1 - P(X>=x) = P(X<x)"))
+    } else {
+      tDF <- data.frame(x=factor(names(fold.enrichment), levels = names(fold.enrichment)),
+                        y=fold.enrichment,
+                        p=p.value)
+      
+      rownames(tDF) <- names(fold.enrichment)
+      
+      
+      
+      print(ggplot(data=tDF, aes(x=x, y=y, label = ifelse(p < 0.01, "*", ""))) + theme_bw()  +
+              geom_bar(stat="identity") +
+              theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1)) +
+              geom_text(vjust = 0) + 
+              ggtitle(plotTitle) + 
+              xlab(xLab) + 
+              ylab("Fold-enrichment"))
+    }
+  }
+
   
 }
 
