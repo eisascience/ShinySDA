@@ -50,5 +50,5 @@ Suggests:
     devtools
 Remotes:
     marchinilab/SDAtools,
-    bimberlabinternal/SDAtools,
+    bimberlabinternal/CellMembrane,
     eisascience/scCustFx
