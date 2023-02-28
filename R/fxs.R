@@ -298,7 +298,7 @@ Run_GeneAnn_evv <- function(envv, input){
     
     # envv$InfoBox_sub = "Checking paths"
     
-    library(biomaRt)
+    
     
     if(envv$Origin == "folder"){
       head.path <- stringr::str_split(envv$path2SDA_dyn, "sda_results/")[[1]][2]
@@ -439,8 +439,6 @@ Run_GO_evv <- function(envv, input){
     
     if(!file.exists(paste0(envv$path2SDA_dyn, "/", head.path,"_SDA_GO_Comps",input$species, ".rds"))){
       
-      library(AnnotationHub) # source("https://bioconductor.org/biocLite.R"); biocLite("AnnotationHub")
-      library(clusterProfiler) # source("https://bioconductor.org/biocLite.R"); biocLite("clusterProfiler")
       
       hub <- AnnotationHub()
       
@@ -1426,8 +1424,7 @@ convertMouseGeneList <- function(x){
 #' @return plots of gene loadings 
 #' @export
 print_loadings_scores <- function(SDAResult = NA, ComponentN=NA, ColFac = NA, Prefix="SDAV", GeneLoc=NA){
-  library(ggthemes)
-  library(scales)
+  
   if(!is.factor(ColFac)) ColFac <- factor(ColFac)
   
   SDAScores    <- SDAResult$scores

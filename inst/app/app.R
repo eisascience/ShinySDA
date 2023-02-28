@@ -8,6 +8,7 @@ library(shinydashboard)
 # library(shinyjs)
 library(shinyFiles)
 
+library(ggforce)
 library(ggplot2)
 library(ggrepel)
 library(viridis)
@@ -26,7 +27,7 @@ library(SDAtools)
 library(Rlabkey)
 library(Rdiscvr)
 
-library(roxygen2)
+# library(roxygen2)
 
 library(rclipboard)
 
@@ -35,6 +36,18 @@ library("BiocParallel")
 register(MulticoreParam(4))
 
 library(ShinySDA)
+
+library(ggthemes)
+library(scales)
+
+library(biomaRt)
+
+library(AnnotationHub) # source("https://bioconductor.org/biocLite.R"); biocLite("AnnotationHub")
+
+library(clusterProfiler) # source("https://bioconductor.org/biocLite.R"); biocLite("clusterProfiler")
+
+library(Matrix)
+
 
 # if (Sys.getenv("SCRATCH_DIR") != "") {
 #   cachedir <- paste0(Sys.getenv("SCRATCH_DIR"), "ShinySDA-cache")
@@ -461,6 +474,7 @@ ui <- dashboardPage(skin="red",
                                     column(10,
                                            uiOutput("CompBatchCheckBoxSelect")
                                     ),
+                                    textInput("CompSelecTextIn", "Paste fail/pass", ""),
                                     actionButton("save_batch_selection", "Save Selection"),
                                     actionButton("load_batch_selection", "Load last Selection"),
                                     actionButton("reset_batch_selection", "Reset last Selection"),
@@ -706,14 +720,32 @@ server <- function(input, output, session) {
 
   output$CompBatchCheckBoxSelect <- renderUI({
     
-    choice <-  1:as.numeric(envv$SDAres$command_arguments$num_comps) #paste0("SDA", 1:as.numeric(envv$SDAres$command_arguments$num_comps)) # envv$QC_components
-    if(is.null(envv$Remove_comps)){
-      selected <- setdiff(choice, envv$QC_components) #setdiff(choice, paste0("SDA",envv$QC_components))
-      
+    split_text = ""
+    
+    MaxCompN = as.numeric(envv$SDAres$command_arguments$num_comps)
+    
+    choice <-  1:MaxCompN #paste0("SDA", 1:as.numeric(envv$SDAres$command_arguments$num_comps)) # envv$QC_components
+    
+    split_text <- unlist(strsplit(input$CompSelecTextIn, " "))
+    
+    if(all(split_text %in% c("pass", "fail")) & length(split_text)==MaxCompN){
+      # print(split_text)
+      # print(length(split_text))
+      #this feels reversed but you are picking comps to remove so pass is not 2 be removed
+      logical_text <- as.logical(ifelse(split_text == "pass", F, T))
+      selected <- choice[logical_text]
+      # envv$Remove_comps = selected
     } else {
-      selected <- envv$Remove_comps
-      
+      if(is.null(envv$Remove_comps)){
+        selected <- setdiff(choice, envv$QC_components) #setdiff(choice, paste0("SDA",envv$QC_components))
+        
+      } else {
+        selected <- envv$Remove_comps
+        
+      }
     }
+    
+    print(selected)
     
     tags$div(align = 'left',
              class = 'multicol',

@@ -75,7 +75,7 @@ observeEvent(input$SaveAsSerObj, {
     
     
     # print(names(envv))
-    library(Seurat)
+    
     
     ## create an empty Seurat object
     Mat1 <- abs(Matrix::rsparsematrix(20, nrow(SDAres$scores), density = .8))

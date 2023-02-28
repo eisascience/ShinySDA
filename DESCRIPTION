@@ -24,7 +24,6 @@ Imports:
     ggplot2,
     ggforce,
     ggthemes,
-    ggthemes,
     ggrepel,
     rclipboard,
     grid,
@@ -39,9 +38,17 @@ Imports:
     org.Mmu.eg.db,
     biomaRt,
     Seurat,
-    SDAtools
+    Rdiscvr,
+    Rlabkey,
+    scales,
+    Matrix,
+    SDAtools,
+    scCustFx
 Suggests:
+    CellMembrane,
     ggvis,
     devtools
 Remotes:
-    marchinilab/SDAtools
+    marchinilab/SDAtools,
+    bimberlabinternal/SDAtools,
+    eisascience/scCustFx

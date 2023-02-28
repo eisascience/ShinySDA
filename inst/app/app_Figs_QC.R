@@ -239,7 +239,7 @@ output$slackslabprior <- renderPlot({
     SDAres <- envv$SDAres
     
     
-    library(ggforce)
+    
     
     density_data <- rbind(data.table(density=as.data.table(density(SDAres$loadings[[1]][SDAres$pips[[1]]>0.5], bw=1e-4, n=5000)[c("x","y")]), type="Slab (PIP>0.5)"),
                           data.table(density=as.data.table(density(SDAres$loadings[[1]][SDAres$pips[[1]]<0.5],bw=1e-4, n=5000)[c("x","y")]), type="Spike (PIP<0.5)"))
