@@ -1087,7 +1087,13 @@ plotEnrich <- function(GeneSetsDF, GeneVec, plotTitle="", xLab="", N = NULL, k =
   }
   
   if(ReturnPval) {
-    return(1-p.value)
+    tDF <- data.frame(x=factor(names(fold.enrichment), levels = names(fold.enrichment)),
+                      y=fold.enrichment,
+                      p=p.value)
+    
+    rownames(tDF) <- names(fold.enrichment)
+    
+    return(tDF)
   } else {
     if(BiPlot) {
       print(ggplot(data=tDF, aes(x=x, y=y, label = ifelse(y < 0.01, "*", ""))) + theme_bw()  +

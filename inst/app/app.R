@@ -63,7 +63,7 @@ if (Sys.getenv("SCRATCH_DIR") != "") {
 
 # source(system.file('app/fxs.R', package = 'ShinySDA', mustWork = TRUE), local = TRUE)
 
-print(Sys.getenv("SCRATCH_DIR"))
+# print(Sys.getenv("SCRATCH_DIR"))
 
 ui <- dashboardPage(skin="red",
                     dashboardHeader(title = "ShinySDA"),
@@ -142,7 +142,7 @@ ui <- dashboardPage(skin="red",
                                     box(textInput("SDA_OFId", "OutputFileId to an SDA Obj", 
                                                   value ="506842"),
                                         textInput("SDA_PS_save", "path to download and SDA objects", 
-                                                  value ="/Volumes/Maggie/Work/OHSU/Bimber/Expts/RIRA_manuscript/data/sda/primeseq/"),
+                                                  value =init.path),
                                         column(
                                           width = 7,
                                           style = "float: left;",
