@@ -56,7 +56,7 @@ library(Matrix)
 # }
 
 if (Sys.getenv("SCRATCH_DIR") != "") {
-  init.path = paste0(Sys.getenv("SCRATCH_DIR"), "/data")
+  init.path = paste0(Sys.getenv("SCRATCH_DIR"), "/data/ShinySDA")
 }  else {
   init.path = getwd()
   if(grepl("Maggie", init.path)) init.path = "/Volumes/Maggie/Work/OHSU/Bimber/Expts/RIRA_manuscript/data/sda/primeseq/"

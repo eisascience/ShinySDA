@@ -107,6 +107,9 @@ Run_DowLoadSDA_evv <- function(envv, input){
     if(!dir.exists(envv$path2SDA_dyn)) {
       dir.create(envv$path2SDA_dyn)
       dir.create(paste0(envv$path2SDA_dyn, "/", "sda_results"))
+      
+      f <- list.files(envv$path2SDA_dyn, all.files = TRUE, full.names = TRUE, recursive = TRUE)
+      Sys.chmod(f, (file.mode(f) | "777"))
     }
     
     # envv$InfoBox_sub = "Downloading Completed"
@@ -136,6 +139,10 @@ if(!file.exists(paste0(envv$path2SDA_dyn, "/", input$SDA_OFId, "_MetaDF.rds"))){
   # metaDF = get_MetaDF(cellbarcodes = rownames(SDAres$scores))
   MetaDF = ShinySDA::DownloadMetadataForSdaResults(input$SDA_OFId)
   saveRDS(MetaDF, paste0(envv$path2SDA_dyn, "/", input$SDA_OFId, "_MetaDF.rds"))
+  
+  f <- list.files(envv$path2SDA_dyn, all.files = TRUE, full.names = TRUE, recursive = TRUE)
+  Sys.chmod(f, (file.mode(f) | "777"))
+  
 } else {
   MetaDF = readRDS(paste0(envv$path2SDA_dyn, "/", input$SDA_OFId, "_MetaDF.rds"))
 }
@@ -231,54 +238,64 @@ Run_LoadSDA_evv <- function(envv, input, session){
 
 
 if(!is.null(envv$sda_path)){
+  
+  print("loading SDA object from:")
   print(envv$sda_path)
   SDAres = readRDS(envv$sda_path)
   
 
-  
-
-  
-  if(!is.null(envv$sda_dims_path)){
-    NamesDimsDF = readRDS(envv$sda_dims_path)
-    rownames(SDAres$scores) <- NamesDimsDF[[1]]
-    colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
+  if(!is.null(SDAres)){
     
-  }
-  colnames(SDAres$scores) = gsub("V", "SDAV", colnames(SDAres$scores))
-  rownames(SDAres$loadings[[1]]) = gsub("V", "SDAV", rownames(SDAres$loadings[[1]]))
-  
-  if(is.null(envv$MetaDF)){
+    if(!is.null(envv$sda_dims_path)){
+      NamesDimsDF = readRDS(envv$sda_dims_path)
+      rownames(SDAres$scores) <- NamesDimsDF[[1]]
+      colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
+      
+    }
+    colnames(SDAres$scores) = gsub("V", "SDAV", colnames(SDAres$scores))
+    rownames(SDAres$loadings[[1]]) = gsub("V", "SDAV", rownames(SDAres$loadings[[1]]))
     
-    envv = ShinySDA:::Run_MetaDF_evv(envv, input, session)
+    if(is.null(envv$MetaDF)){
+      
+      envv = ShinySDA:::Run_MetaDF_evv(envv, input, session)
+    }
+    
+    
+    
+    # print(head(MetaDF))
+    
+    # envv$InfoBox_sub = "Load from Prime-seq completed, starting pre-processing"
+    #adds some stats
+    envv$SDAres  <- ShinySDA::AddCompStats(SDAres)
+    
+    # print("CompStats added")
+    
+    # envv$SDAres <- SDAres
+    
+    envv <- ShinySDA::preprocess_SDA(QuantThr = 0.95, 
+                                     envv = envv,
+                                     TopN = 150, MetaDF = NULL)
+    print(envv$FailingFilters)
+    
+    
+    
+    envv$Ncomp = ncol(SDAres$scores)
+    envv$Ncell = nrow(SDAres$scores)
+    envv$Ngene = ncol(SDAres$loadings[[1]])
+    
+    
+    envv$InfoBox_sub = paste0("Load and pre-processing complete\n",
+                              "Ncomp: ", envv$Ncomp, " Ncells: ", envv$Ncell, " Ngenes: ", envv$Ngene)
+    
+  } else {
+    print("SDA object loaded is NULL")
   }
-  
-  
-  
-  # print(head(MetaDF))
-  
-  # envv$InfoBox_sub = "Load from Prime-seq completed, starting pre-processing"
-  #adds some stats
-  envv$SDAres  <- ShinySDA::AddCompStats(SDAres)
-  
-  # print("CompStats added")
-  
-  # envv$SDAres <- SDAres
 
-  envv <- ShinySDA::preprocess_SDA(QuantThr = 0.95, 
-                                  envv = envv,
-                                  TopN = 150, MetaDF = NULL)
-  print(envv$FailingFilters)
   
-  
-
-  envv$Ncomp = ncol(SDAres$scores)
-  envv$Ncell = nrow(SDAres$scores)
-  envv$Ngene = ncol(SDAres$loadings[[1]])
  
-  
-  envv$InfoBox_sub = paste0("Load and pre-processing complete\n",
-                            "Ncomp: ", envv$Ncomp, " Ncells: ", envv$Ncell, " Ngenes: ", envv$Ngene)
-  
+} else {
+  print("sda_path was null, env not updated")
+  print(envv$sda_path)
 }
   
   return(envv)
