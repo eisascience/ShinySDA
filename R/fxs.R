@@ -99,6 +99,12 @@ Run_DowLoadSDA_evv <- function(envv, input){
                                defaultFolder = input$defaultFolder)
     
     
+    if(dir.exists(input$SDA_PS_save)) {
+      f <- list.files(input$SDA_PS_save, all.files = TRUE, full.names = TRUE, recursive = TRUE)
+      Sys.chmod(f, (file.mode(f) | "777"))
+    }
+    
+    
     envv$sda_path = ShinySDA::download_SDA(outf = input$SDA_PS_save, outFileID=input$SDA_OFId)
     envv$sda_dims_path = ShinySDA::download_SDA_dimnames(outf = input$SDA_PS_save, outFileID=input$SDA_OFId)
     

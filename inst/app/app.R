@@ -57,9 +57,11 @@ library(Matrix)
 
 if (Sys.getenv("SCRATCH_DIR") != "") {
   init.path = paste0(Sys.getenv("SCRATCH_DIR"), "/data/ShinySDA")
+  serv = "monkeydo"
 }  else {
   init.path = getwd()
   if(grepl("Maggie", init.path)) init.path = "/Volumes/Maggie/Work/OHSU/Bimber/Expts/RIRA_manuscript/data/sda/primeseq/"
+  serv = "local"
 }
 
 
@@ -664,6 +666,8 @@ server <- function(input, output, session) {
   
   ## controls how to handle pipe depending on data
   envv$Origin = "unk"
+  envv$serv = serv
+  
   
   ## Feature Enrichment; used in returning enrichment profile from chi sqr analysis
   # envv$FeatEnrich$pos = list()
