@@ -420,10 +420,10 @@ Run_GeneAnn_evv <- function(envv, input){
 }
 
 
-#' This function to update the environment list when running GO enrichmet analysis
+#' This function to update the environment list when running GO enrichment analysis
 #'
 #' @param envv environment list associated with ShinySDA
-#' @param input environment list associated with innput paramters in ShinySDA
+#' @param input environment list associated with input parameters in ShinySDA
 #' @return the updated environment list
 Run_GO_evv <- function(envv, input){
   
@@ -455,6 +455,7 @@ Run_GO_evv <- function(envv, input){
     
     SDAres <- envv$SDAres
     
+    print(input$species)
     
     
     
