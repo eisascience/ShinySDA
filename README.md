@@ -55,9 +55,15 @@ Produced by: @eisamahyari
 
 ## Install : 
 
+    BiocManager::install("Rlabkey")
+    BiocManager::install("demuxmix")
+    BiocManager::install("BiocParallel")
+    install.packages("wordcloud")
+    devtools::install_github(repo = 'bimberlab/cellhashR', ref = 'master', dependencies = TRUE, upgrade = 'always')
+    devtools::install_github(repo = 'eisascience/scCustFx', dependencies = T, upgrade = 'always')
 
-    devtools::install_github(repo = 'bimberlabinternal/ShinySDA', dependencies = T, upgrade = 'always')
-
+    devtools::install_github(repo = 'eisascience/ShinySDA', dependencies = T, upgrade = 'always')
+    
 ## Launch : 
 
     ShinySDA::launchShinySDA()
