@@ -5,7 +5,6 @@
 library(shiny)
 library(shinyWidgets)
 library(shinydashboard)
-# library(shinyjs)
 library(shinyFiles)
 
 library(ggforce)
@@ -203,7 +202,7 @@ ui <- dashboardPage(skin="red",
                                       actionButton("getGeneAnn", "1. Get Gene Annotations"),
                                       actionButton("getSDAGo", "2. Get SDA GO Enrichments"),
                                       actionButton("runtSNE", "3. Run tSNE (cs-all)"),
-                                      actionButton("runtSNEQCfilt", "4.5 Run tSNE (cs-qc)"),
+                                      # actionButton("runtSNEQCfilt", "4.5 Run tSNE (cs-qc)"),
                                       actionButton("runAllProc", "** Run all **"),
                                       
                                       # textInput("loadSDAmsg", "File Status", "not loaded"),
@@ -222,13 +221,14 @@ ui <- dashboardPage(skin="red",
                                     collapsible = TRUE,
                                     plotOutput("tSNE_CS_all"), 
                                     width = 5, background = "black"
-                                  ),
-                                  box(
-                                    title = "tSNE_CS_QC", status = "primary", solidHeader = TRUE,
-                                    collapsible = TRUE,
-                                    plotOutput("tSNE_CS_qc"), 
-                                    width = 5, background = "black"
-                                  ))),
+                                  )#,
+                                  # box(
+                                  #   title = "tSNE_CS_QC", status = "primary", solidHeader = TRUE,
+                                  #   collapsible = TRUE,
+                                  #   plotOutput("tSNE_CS_qc"), 
+                                  #   width = 5, background = "black"
+                                  # )
+                                  )),
                         
                         # QC plots-------
                         tabItem(tabName = "QCplots",
@@ -484,6 +484,7 @@ ui <- dashboardPage(skin="red",
                                     actionButton("reset_batch_selection", "Reset last Selection"),
                                     actionButton("select_all_selection", "Select all"),
                                     width=5, background = "black"),
+                                  
                                   box(
                                     title = "Run tSNE Batch Removed", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE, 
@@ -503,7 +504,8 @@ ui <- dashboardPage(skin="red",
                                                   "200-max" = "200",
                                                   "300-insane!"  = "300"), selected = "50"),
                                     actionButton("run_tSNE_CS_batch", "Run tSNE (batch-removed)"),
-                                    actionButton("SDAScoresChi_clus", "Show/Hide Pairwise Clustering"),
+                                    # actionButton("run_UMAP_CS_batch", "Run UMAP (batch-removed)"),
+                                    # actionButton("SDAScoresChi_clus", "Show/Hide Pairwise Clustering"),
                                     width = 5, background = "black",
                                   ),
                                   
@@ -513,8 +515,43 @@ ui <- dashboardPage(skin="red",
                                     title = "tSNE Batch removed", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,
                                     plotOutput("DGE_SDA_tSNE"), 
+                                    
+                                    width = 10, background = "black"
+                                  ),
+                                  
+                                  box(
+                                    title = "Run UMAP Batch Removed", status = "primary", solidHeader = TRUE,
+                                    collapsible = TRUE, 
+                                    
+                                    selectInput("UMAPiter", "UMAP n-iter:",
+                                                c("Fast-300" = "300",
+                                                  "Fast2-500" = "500",
+                                                  "Med1-1000" = "1000",
+                                                  "Robust-2000" = "2000",
+                                                  "OverKill-5000" = "5000"), selected = "300"),
+                                    selectInput("UMAPspread", "UAMP spread:",
+                                                c("0,1-tightest" = "0.1",
+                                                  "0.5-tight" = "0.5",
+                                                  "1-default" = "1",
+                                                  "1.5-loose" = "1.5",
+                                                  "2.0-loosest" = "2.0"
+                                                  ), selected = "1"),
+                                    actionButton("run_UMAP_CS_batch", "Run UMAP (batch-removed)"),
+                                    width = 5, background = "black",
+                                  ),
+                                  
+                                  
+                                  
+                                  box(
+                                    
+                                    title = "UMAP Batch removed", status = "primary", solidHeader = TRUE,
+                                    collapsible = TRUE,
+                                    plotOutput("DGE_SDA_UMAP"), 
+                                    
                                     width = 10, background = "black"
                                   )
+                                  
+                                  
                                 )
                         ),
                         
@@ -523,10 +560,12 @@ ui <- dashboardPage(skin="red",
                                 h2("DGE_SDA Batched Removed DGE"),
                                 fluidRow(
                                   box(
-                                    title = "tSNE Meta Exploration", status = "primary", solidHeader = TRUE,
+                                    title = "UMAP Meta Exploration", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,
                                     
-                                    plotOutput("tSNE_CS_batch1"),
+                                    # plotOutput("tSNE_CS_batch1"),
+                                    plotOutput("UMAP_CS_batch1"),
+                                    
                                     selectInput("Metaselect1", "Meta select:",
                                                 c("Population" = "Population",
                                                   "SampleDate" = "SampleDate",
@@ -709,6 +748,7 @@ server <- function(input, output, session) {
   source("app_OE_biomart.R",local = TRUE)
   source("app_OE_GO.R",local = TRUE)
   source("app_OE_tSNE.R",local = TRUE)
+  source("app_OE_UMAP.R",local = TRUE)
   
   
   ## Plots--------------------------------------
@@ -718,6 +758,9 @@ server <- function(input, output, session) {
   source("app_Figs_ChiSqr.R",local = TRUE)
   
   source("app_Figs_QC.R",local = TRUE)
+  
+  source("app_Figs_tSNE.R",local = TRUE)
+  source("app_Figs_UMAP.R",local = TRUE)
   
   ## Batch removal tab--------------------------------------
   

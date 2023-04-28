@@ -7,8 +7,8 @@ observeEvent(input$runAllProc, {
   envv = ShinySDA:::Run_GeneAnn_evv(envv, input = input)
   envv$InfoBox_sub = "Starting tSNE with cell scores - all comps.. wait"
   envv = ShinySDA:::Run_tSNE_full_evv(envv, input = input)
-  envv$InfoBox_sub = "Starting tSNE with cell scores - qc comps.. wait"
-  envv = ShinySDA:::Run_tSNE_QC_envv(envv, input = input)
+  # envv$InfoBox_sub = "Starting tSNE with cell scores - qc comps.. wait"
+  # envv = ShinySDA:::Run_tSNE_QC_envv(envv, input = input)
   envv$InfoBox_sub <- "Stating GO"
   envv = ShinySDA:::Run_GO_evv(envv, input = input)
   

@@ -2,18 +2,18 @@
 % Please edit documentation in R/fxs.R
 \name{Run_GO_evv}
 \alias{Run_GO_evv}
-\title{This function to update the environment list when running GO enrichmet analysis}
+\title{This function to update the environment list when running GO enrichment analysis}
 \usage{
 Run_GO_evv(envv, input)
 }
 \arguments{
 \item{envv}{environment list associated with ShinySDA}
 
-\item{input}{environment list associated with innput paramters in ShinySDA}
+\item{input}{environment list associated with input parameters in ShinySDA}
 }
 \value{
 the updated environment list
 }
 \description{
-This function to update the environment list when running GO enrichmet analysis
+This function to update the environment list when running GO enrichment analysis
 }
