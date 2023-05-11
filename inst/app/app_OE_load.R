@@ -37,7 +37,7 @@ observeEvent(input$loadSDA, {
   envv$Origin = "folder"
   envv$InfoBox_sub = "Loading from SDA folder (traditional)"
   
-  envv = ShinySDA:::Run_LoadSDA_local_evv(envv, input)
+  envv = ShinySDA:::Run_LoadSDA_local_evv(envv, input, session)
   
   
 })

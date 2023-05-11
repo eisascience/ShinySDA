@@ -27,13 +27,26 @@ output$DGE_SDA_UMAP <- renderPlot({
       
     } else {
       MetaDF <- envv$MetaDF
-      UMAPDF$library_size <- MetaDF[rownames(UMAPDF), ]$library_size
-      
-      ggplot(UMAPDF, aes(UMAP1_batch, UMAP2_batch, color=log10(library_size))) +
-        geom_point(size = 1) + theme_bw() +
-        scale_color_distiller(palette = "Spectral")  +
-        ggtitle("UMAP SDA batch removed\n log10 library size \n ")+
-        theme(legend.position = "bottom", aspect.ratio=1)
+      if("library_size" %in% colnames(MetaDF)){
+        UMAPDF$library_size <- MetaDF[rownames(UMAPDF), ]$library_size
+        
+        ggplot(UMAPDF, aes(UMAP1_batch, UMAP2_batch, color=log10(library_size))) +
+          geom_point(size = 1) + theme_bw() +
+          scale_color_distiller(palette = "Spectral")  +
+          ggtitle("UMAP SDA batch removed\n log10 library size \n ")+
+          theme(legend.position = "bottom", aspect.ratio=1)
+      } else {
+        
+        UMAPDF$SumScore <- rowSums(abs(envv$SDAres$scores))
+        UMAPDF$SumScore <- UMAPDF$SumScore/mean(UMAPDF$SumScore)
+        
+        ggplot(UMAPDF, aes(UMAP1_batch, UMAP2_batch, color=(SumScore))) +
+          geom_point(size = 1) + theme_bw() +
+          scale_color_distiller(palette = "Spectral")  +
+          ggtitle("UMAP SDA batch removed\n  Sum absolute-cell-scores normalized by its mean \n ")+
+          theme(legend.position = "bottom", aspect.ratio=1)
+        
+      }
     }
   }
   

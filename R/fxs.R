@@ -6,7 +6,7 @@
 #' @param envv environment list associated with ShinySDA
 #' @param input environment list associated with innput paramters in ShinySDA
 #' @return the updated environment list
-Run_LoadSDA_local_evv <- function(envv, input){
+Run_LoadSDA_local_evv <- function(envv, input, session){
 
 # print(head(paste0(input$SDAroot, "/", input$folder.name)))
 
@@ -23,7 +23,6 @@ if(file.exists(envv$path2SDA_dyn)) {
     DimNamesPath <- paste0(dirname(dirname(envv$path2SDA_dyn)), "/")
   } else {
     DimNamesPath <- paste0(dirname(envv$path2SDA_dyn), "/")
-    log
   }
   print(DimNamesPath)
   
@@ -36,8 +35,12 @@ if(file.exists(envv$path2SDA_dyn)) {
   
   
   #update the names
-  colnames(SDAres$scores) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
-  rownames(SDAres$loadings[[1]]) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
+  # colnames(SDAres$scores) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
+  # rownames(SDAres$loadings[[1]]) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
+  colnames(SDAres$scores) = gsub("V", "SDAV", colnames(SDAres$scores))
+  rownames(SDAres$loadings[[1]]) = gsub("V", "SDAV", rownames(SDAres$loadings[[1]]))
+  
+
   
   if(file.exists(paste0(envv$path2SDA_dyn, "_dimnames.rds"))){
     # print(head(NamesDimsDF))
@@ -66,16 +69,26 @@ if(file.exists(envv$path2SDA_dyn)) {
   envv$Ncell = nrow(SDAres$scores)
   envv$Ngene = ncol(SDAres$loadings[[1]]) 
   
+  if(is.null(envv$MetaDF)){
+    
+    envv = ShinySDA:::Run_MetaDF_local_evv(envv, input, session)
+  }
+  
   
   envv$InfoBox_sub = paste0("Load and pre-processing complete\n",
                             "Ncomp: ", envv$Ncomp, " Ncells: ", envv$Ncell, " Ngenes: ", envv$Ngene)
+
   
+
+  
+    
+  
+  
+    
   
 } else { 
   # updateTextInput(session, "loadSDAmsg", value = "File not found")
   envv$InfoBox_sub = "File not found loading error"
-  
-  
   
 }
 return(envv)
@@ -129,6 +142,111 @@ Run_DowLoadSDA_evv <- function(envv, input){
   
   return(envv)
 }
+
+' This function to update the environment list when grabbing the meta data DF
+#'
+#' @param envv environment list associated with ShinySDA
+#' @param input environment list associated with innput paramters in ShinySDA
+#' @param session session  associated with ShinySDA
+#' @return the updated environment list
+Run_MetaDF_local_evv <- function(envv, input, session){
+  
+  
+  ##-------
+  files.path = list.files(dirname(envv$path2SDA_dyn), 
+                          recursive = T, full.names = T)
+  
+  if(sum(grepl("_MetaDF.rds",  files.path))>0){
+    
+    DimNamesPath <- files.path[grepl("_MetaDF.rds",  files.path)]
+    if(length(DimNamesPath)>1) {
+      print("lenght DimNamesPath > 1 choosing 1st")
+      DimNamesPath = DimNamesPath[1]
+    }
+    
+    MetaDF = readRDS(DimNamesPath)
+    # rownames(MetaDF) = MetaDF$cellbarcode
+    
+    envv$InfoBox_sub = "Metadata Loaded"
+    
+    
+    
+    PossibleMetaVec = c("SampleDate", "SubjectId", "ExpID",
+                        "SingleR_Labels","SingleR_Labels_Fine",
+                        "hpca.label", "hpca.label.fine",
+                        "blueprint.label", "blueprint.label.fine",
+                        "predicted_labels", "majority_voting",
+                        "Phase", "BarcodePrefix", "DatasetId",
+                        "Population", "WorkbookId", "Tissue", 
+                        "Stim", "cDNA_ID", "scDblFinder.class", "orig.ident",
+                        "Submission", "SRR",
+                        "RNA_snn_res.0.2", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2")
+    
+    PossibleMetaVec = PossibleMetaVec[PossibleMetaVec %in% colnames(MetaDF)]
+    
+    envv$PossibleMetaVec = PossibleMetaVec
+    
+    updateSelectInput(session, 
+                      "Metaselect1",
+                      choices = PossibleMetaVec, 
+                      selected = PossibleMetaVec[1])
+    
+    updateSelectInput(session, 
+                      "Metaselect2",
+                      choices = PossibleMetaVec, 
+                      selected = PossibleMetaVec[1])
+    
+    
+    updateSelectInput(session, 
+                      "Metaselect3",
+                      choices = PossibleMetaVec, 
+                      selected = PossibleMetaVec[1])
+    
+    updateSelectInput(session, 
+                      "Metaselect4",
+                      choices = PossibleMetaVec, 
+                      selected = PossibleMetaVec[1])
+    
+    #Cell scores Boxplot
+    updateSelectInput(session, 
+                      "Metaselect5",
+                      choices = PossibleMetaVec, 
+                      selected = PossibleMetaVec[1])
+    
+    #Cell scores Across
+    updateSelectInput(session, 
+                      "Metaselect6",
+                      choices = PossibleMetaVec, 
+                      selected = PossibleMetaVec[1])
+    
+    updateCheckboxGroupInput(session, "chkbx_MetaSave", choices = PossibleMetaVec, selected =  PossibleMetaVec[1])
+    
+    
+    
+    #$SubjectId, $ExpID, $EXP.ID, $SampleDate, $SingleR_Labels, $BarcodePrefix
+    
+    for(featX in PossibleMetaVec){
+      #TODO: seprate out cleaning of meta in a fx
+      
+      if(featX == "SubjectId") { MetaDF[,featX] = paste0("Rh", MetaDF[,featX]) }
+      if(featX %in% c("RNA_snn_res.0.2", "RNA_snn_res.0.6", "RNA_snn_res.1.2")) { MetaDF[,featX] = paste0("Cl", MetaDF[,featX]) }
+      
+      MetaDF[,featX] = factor( MetaDF[,featX])
+    }
+    
+    # print(head(MetaDF))
+    
+    MetaDF$library_size = MetaDF$nCount_RNA
+    MetaDF$ExpID = MetaDF$Population
+    MetaDF$EXP.ID = MetaDF$RNA_snn_res.0.2 #TODO this is a patch EXP.ID needs to be removed and consquent fx updated to use envv$PossibleMetaVec
+    
+    envv$MetaDF = MetaDF
+    
+    return(envv)
+    
+  }
+}
+
 
 #' This function to update the environment list when grabbing the meta data DF
 #'
@@ -346,9 +464,7 @@ Run_GeneAnn_evv <- function(envv, input){
     
     SDAres <- envv$SDAres
     
-    # stringr::str_split("../../../../Conrad/R/Utah/sda_results/Testis_Run2", "sda_results/")
-    
-    # basename("../../../../Conrad/R/Utah/sda_results/Testis_Run2")
+  
     
     print(paste0("looking for files: ", envv$path2SDA_dyn, "/", head.path, "_SDAtools_GeneLoc_", input$species, ".rds"))
     print(paste0(envv$path2SDA_dyn, "/", head.path, "_SDAtools_", input$species,".chromosome.lengths.rds"))
@@ -1495,10 +1611,16 @@ print_loadings_scores <- function(SDAResult = NA, ComponentN=NA, ColFac = NA, Pr
 #' @export
 get.location <- function(gene.symbols, data_set, gene_name){
   
-  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", host = "www.ensembl.org", dataset = data_set)
+  ensembl <- useMart("ENSEMBL_MART_ENSEMBL", host="https://www.ensembl.org",
+                     # path="/biomart/martservice", 
+                     archive=FALSE, verbose = T ,
+                     dataset = data_set)
   
   mapTab <- getBM(attributes = c(gene_name,'chromosome_name','start_position'),
-                  filters = gene_name, values = gene.symbols, mart = ensembl, uniqueRows=TRUE)
+                  filters = gene_name, 
+                  values = gene.symbols, 
+                  mart = ensembl, uniqueRows=TRUE,
+                  verbose = T)
   
   mapTab <- as.data.table(mapTab)
   

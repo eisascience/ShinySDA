@@ -69,30 +69,44 @@ output$tSNE_CS_qc <- renderPlot({
 
 output$SDAtsne_br1 <- renderPlot({
   
-  if(is.null(envv$SDAres)){
-    plot(x=0, y=0, main="Load an SDA")
+  if(is.null(envv$tsne_CS_batch)){
+    plot(x=0, y=0, main="Run tSNE an SDA")
   } else {
-    print("QC_compIter: ")
+    # print("QC_compIter: ")
     # print(envv$QC_compIter)
+    
+    
     zN = envv$QC_compIter
     
     SDAres <- envv$SDAres
-    tempDFX <- as.data.frame(envv$tsne_CS_qc$Y)
-    colnames(tempDFX) <- c("tSNE1_qc", "tSNE2_qc")
+    tempDFX <- as.data.frame(envv$tsne_CS_batch$Y)
+    rownames(tempDFX)  <- rownames(envv$SDAres$scores)
+    colnames(tempDFX) <- c("tSNE1_batch", "tSNE2_batch")
     
-    print(head(SDAres$scores))
+    if(zN %in% envv$Remove_comps) RemoveTag = "removed" else RemoveTag = "kept"
     
-    tempDFX$SDAComp <- SDAres$scores[,paste0("SDAV", zN, sep="")]
     
-    # print(head(tempDFX))
+    tempDFX$SDAComp <- cut(asinh(SDAres$scores[,paste0("SDAV", zN, sep="")]^3), 
+                           breaks = c(-Inf, -1, -.5, 0, .5, 1, Inf))
     
-    ggplot(tempDFX, aes(tSNE1_qc, tSNE2_qc,  color=cut(asinh(SDAComp^3), breaks = c(-Inf, -1, -.5, 0, .5, 1, Inf)))) +
+    tempDFX$SDAComp <- factor(tempDFX$SDAComp, 
+                              levels = c("(-Inf,-1]", "(-1,-0.5]", "(-0.5,0]",  "(0,0.5]",   "(0.5,1]",   "(1, Inf]" ) )
+    # print(tempDFX$SDAComp)
+    # print(factor(tempDFX$SDAComp))
+    # print(factor(tempDFX$SDAComp, 
+    #              levels = c("(-Inf,-1]", "(-1,-0.5]", "(-0.5,0]",  "(0,0.5]",   "(0.5,1]",   "(1, Inf]" ) ))
+    
+    ggplot(tempDFX, aes(tSNE1_batch, tSNE2_batch,  color=tempDFX$SDAComp)) +
       geom_point(size = 1) + theme_bw() +
       scale_color_manual("CS", values = rev(c("red", "orange", "yellow", "lightblue", "dodgerblue", "blue")) ) + 
       guides(colour = guide_legend(override.aes = list(size = 2, alpha=1))) +
       theme(legend.position = "bottom", aspect.ratio=1) + 
-      simplify2 + coord_cartesian(xlim = NULL, ylim = NULL, expand = FALSE) + 
-      ggtitle(paste0("SDAV", zN, sep=""))+ylab("asinh(SDAscore^3)")
+      simplify2 + coord_cartesian(xlim = NULL, ylim = NULL, expand = FALSE) +
+      ggtitle(paste0("SDAV", zN, " :: ", RemoveTag))+
+      ylab("asinh(SDAscore^3)")
+    
+    
+
     
   }
 })
@@ -125,13 +139,27 @@ output$DGE_SDA_tSNE <- renderPlot({
       
     } else {
       MetaDF <- envv$MetaDF
-      tsneDF$library_size <- MetaDF[rownames(tsneDF), ]$library_size
+      if("library_size" %in% colnames(MetaDF)){
+        tsneDF$library_size <- MetaDF[rownames(tsneDF), ]$library_size
+        
+        ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=log10(library_size))) +
+          geom_point(size = 1) + theme_bw() +
+          scale_color_distiller(palette = "Spectral")  +
+          ggtitle("tSNE SDA batch removed\n log10 library size \n ")+
+          theme(legend.position = "bottom", aspect.ratio=1)
+      } else {
+        
+        tsneDF$SumScore <- rowSums(abs(envv$SDAres$scores))
+        tsneDF$SumScore <- tsneDF$SumScore/mean(tsneDF$SumScore)
+        
+        ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=(SumScore))) +
+          geom_point(size = 1) + theme_bw() +
+          scale_color_distiller(palette = "Spectral")  +
+          ggtitle("tSNE SDA batch removed\n  Sum absolute-cell-scores normalized by its mean \n ")+
+          theme(legend.position = "bottom", aspect.ratio=1)
+        
+      }
       
-      ggplot(tsneDF, aes(tSNE1_batch, tSNE2_batch, color=log10(library_size))) +
-        geom_point(size = 1) + theme_bw() +
-        scale_color_distiller(palette = "Spectral")  +
-        ggtitle("tSNE SDA batch removed\n log10 library size \n ")+
-        theme(legend.position = "bottom", aspect.ratio=1)
     }
   }
   
