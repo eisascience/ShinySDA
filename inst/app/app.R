@@ -649,13 +649,20 @@ ui <- dashboardPage(skin="red",
                                     br(), "Also, single or double quotes or not",
                                     #sliderInput("ComponentN", "Slider input:", 1, 150, 1),
                                     textInput("GeneSet", "A set of genes", "'CD19', 'CD20', 'MS4A1', 'IGHM', 'IGHA2'"),
+                                    width = 10
+                                  ),
+                                  
+                                  box(
+                                    title = "tSNE BatchRemoved-DGE Expr", status = "primary", solidHeader = TRUE,
+                                    collapsible = TRUE,
+                                    plotOutput("GeneExprSDAtSNE"),
                                     width = 5
                                   ),
                                   
                                   box(
-                                    title = "BatchRemoved-DGE Expr", status = "primary", solidHeader = TRUE,
+                                    title = "UMAP BatchRemoved-DGE Expr", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,
-                                    plotOutput("GeneExprSDAtSNE"),
+                                    plotOutput("GeneExprSDAUMAP"),
                                     width = 5
                                   ),
                                   
