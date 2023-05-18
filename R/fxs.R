@@ -143,7 +143,7 @@ Run_DowLoadSDA_evv <- function(envv, input){
   return(envv)
 }
 
-' This function to update the environment list when grabbing the meta data DF
+#' This function to update the environment list when grabbing the meta data DF
 #'
 #' @param envv environment list associated with ShinySDA
 #' @param input environment list associated with innput paramters in ShinySDA

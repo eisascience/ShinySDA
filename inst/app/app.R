@@ -573,18 +573,7 @@ ui <- dashboardPage(skin="red",
                                                   "Phase" = "Phase"), selected = "Population"),
                                     width = 5, background = "black"
                                   ),
-                                  box(
-                                    title = "tSNE Meta Exploration", status = "primary", solidHeader = TRUE,
-                                    collapsible = TRUE,
-                                    
-                                    plotOutput("tSNE_CS_batch2"),
-                                    selectInput("Metaselect2", "Meta select:",
-                                                c("Population" = "Population",
-                                                  "SampleDate" = "SampleDate",
-                                                  "SubjectId" = "SubjectId",
-                                                  "Phase" = "Phase"), selected = "Population"),
-                                    width = 5, background = "black"
-                                  ),
+                                 
                                   box(
                                     title = "tSNE Meta Exploration", status = "primary", solidHeader = TRUE,
                                     collapsible = TRUE,
@@ -607,6 +596,19 @@ ui <- dashboardPage(skin="red",
                                       textInput("SDAVn", "SDA comp. No:"),
                                       plotOutput("SDAtsne_br2"),
                                       width=5, background = "black"
+                                  ),
+                                  box(
+                                    title = "UMAP SDA projection", status = "primary", solidHeader = TRUE,
+                                    collapsible = TRUE,
+                                    
+                                    plotOutput("SDAumap_br2"),
+                                    # plotOutput("tSNE_CS_batch2"),
+                                    # selectInput("Metaselect2", "Meta select:",
+                                    #             c("Population" = "Population",
+                                    #               "SampleDate" = "SampleDate",
+                                    #               "SubjectId" = "SubjectId",
+                                    #               "Phase" = "Phase"), selected = "Population"),
+                                    width = 5, background = "black"
                                   ),
                                   box(title = "SDA score tabulation", status = "primary", solidHeader = TRUE,
                                       collapsible = TRUE,

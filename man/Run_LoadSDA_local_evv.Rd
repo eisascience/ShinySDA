@@ -4,7 +4,7 @@
 \alias{Run_LoadSDA_local_evv}
 \title{This function to update the environment list when loading from local}
 \usage{
-Run_LoadSDA_local_evv(envv, input)
+Run_LoadSDA_local_evv(envv, input, session)
 }
 \arguments{
 \item{envv}{environment list associated with ShinySDA}
