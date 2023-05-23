@@ -171,7 +171,8 @@ Run_MetaDF_local_evv <- function(envv, input, session){
     
     
     
-    PossibleMetaVec = c("SampleDate", "SubjectId", "ExpID",
+    PossibleMetaVec = c("SampleDate", "SubjectId", "ExpID", 
+                        "DonorID", "DonorIDa", "DonorIDb", "DonorIDc", 
                         "SingleR_Labels","SingleR_Labels_Fine",
                         "hpca.label", "hpca.label.fine",
                         "blueprint.label", "blueprint.label.fine",
@@ -179,8 +180,12 @@ Run_MetaDF_local_evv <- function(envv, input, session){
                         "Phase", "BarcodePrefix", "DatasetId",
                         "Population", "WorkbookId", "Tissue", 
                         "Stim", "cDNA_ID", "scDblFinder.class", "orig.ident",
-                        "Submission", "SRR",
-                        "RNA_snn_res.0.2", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2")
+                        "SRAStudy", "BioProject", "Study_Pubmed_id", "ProjectID", 
+                        "Sample", "BioSample", "SampleType", "TaxID",
+                        "LibraryLayout",
+                        "Submission", "SRR", "AgeGroup", "Pathology", "Origin", 
+                        "RNA_snn_res.0.2", "RNA_snn_res.0.4", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2",
+                        "Pheno", "Phenp1", "Pheno2", "Pheno3")
     
     PossibleMetaVec = PossibleMetaVec[PossibleMetaVec %in% colnames(MetaDF)]
     
@@ -276,16 +281,21 @@ rownames(MetaDF) = MetaDF$cellbarcode
 envv$InfoBox_sub = "Metadata Loaded"
 
 
-PossibleMetaVec = c("SampleDate", "SubjectId", "ExpID",
-                    "SingleR_Labels","SingleR_Labels_Fine",
-                    "hpca.label", "hpca.label.fine",
-                    "blueprint.label", "blueprint.label.fine",
-                    "predicted_labels", "majority_voting",
-                    "Phase", "BarcodePrefix", "DatasetId",
-                    "Population", "WorkbookId", "Tissue", 
-                    "Stim", "cDNA_ID", "scDblFinder.class", "orig.ident",
-                    "Submission", "SRR",
-                    "RNA_snn_res.0.2", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2")
+PossibleMetaVec =  c("SampleDate", "SubjectId", "ExpID", 
+                     "DonorID", "DonorIDa", "DonorIDb", "DonorIDc", 
+                     "SingleR_Labels","SingleR_Labels_Fine",
+                     "hpca.label", "hpca.label.fine",
+                     "blueprint.label", "blueprint.label.fine",
+                     "predicted_labels", "majority_voting",
+                     "Phase", "BarcodePrefix", "DatasetId",
+                     "Population", "WorkbookId", "Tissue", 
+                     "Stim", "cDNA_ID", "scDblFinder.class", "orig.ident",
+                     "SRAStudy", "BioProject", "Study_Pubmed_id", "ProjectID", 
+                     "Sample", "BioSample", "SampleType", "TaxID",
+                     "LibraryLayout",
+                     "Submission", "SRR", "AgeGroup", "Pathology", "Origin", 
+                     "RNA_snn_res.0.2", "RNA_snn_res.0.4", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2",
+                     "Pheno", "Phenp1", "Pheno2", "Pheno3")
 
 PossibleMetaVec = PossibleMetaVec[PossibleMetaVec %in% colnames(MetaDF)]
 
