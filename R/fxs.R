@@ -185,7 +185,7 @@ Run_MetaDF_local_evv <- function(envv, input, session){
                         "LibraryLayout",
                         "Submission", "SRR", "AgeGroup", "Pathology", "Origin", 
                         "RNA_snn_res.0.2", "RNA_snn_res.0.4", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2",
-                        "Pheno", "Phenp1", "Pheno2", "Pheno3")
+                        "Pheno", "Pheno1", "Pheno2", "Pheno3")
     
     PossibleMetaVec = PossibleMetaVec[PossibleMetaVec %in% colnames(MetaDF)]
     

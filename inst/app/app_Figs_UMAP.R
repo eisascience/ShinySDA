@@ -147,6 +147,11 @@ output$GeneExprSDAUMAP <- renderPlot({
       
       TitleX = paste0("Sum-Expr of :", paste(GeneSet, collapse = "_") )
       
+      if(is.null(rownames(SDAres$loadings[[1]]))){
+        rownames(SDAres$loadings[[1]]) = paste0("C", 1:nrow(SDAres$loadings[[1]]))
+      }
+      
+    
       LoadOrdVal <- round(SDAres$loadings[[1]][,as.character(GeneSet[1])][order(abs(SDAres$loadings[[1]][,as.character(GeneSet[1])]), decreasing = T)], 3)
       
       
