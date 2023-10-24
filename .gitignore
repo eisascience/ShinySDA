@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+.Rprofile
+.gitignore
+Dockerfile_old.R
+inst/app/apik.R
+.DS_Store
