@@ -54,15 +54,25 @@ library(Matrix)
 #   cachedir <- paste0(Sys.getenv("TMPDIR"), "ShinySDA-cache")
 # }
 
+LabName = "Labs/Conrad"
+# LabName = "Labs/Bimber"
+# LabName = "Labs/Gill"
+
+WorkingPath = "/Volumes/Maggie/Work/OHSU/Conrad/R/MouseTestis/MouseTestisAtlas2024/data/sda/primeseq/"
+# WorkingPath ="/Volumes/Maggie/Work/OHSU/Conrad/R/MouseTestis/MouseTestisGEXTCR2024/data/sda/primeseq/"
+#/Volumes/Maggie/Work/OHSU/Tejpal/TejP_hu_Autoimm/data/sda/primeseq/
+#/Volumes/Maggie/Work/OHSU/Bimber/Expts/RIRA_manuscript/data/sda/primeseq/
+#
+
+
 if (Sys.getenv("SCRATCH_DIR") != "") {
   init.path = paste0(Sys.getenv("SCRATCH_DIR"), "/data/ShinySDA")
   serv = "monkeydo"
 }  else {
   init.path = getwd()
-  if(grepl("Maggie", init.path)) init.path = "/Volumes/Maggie/Work/OHSU/Bimber/Expts/RIRA_manuscript/data/sda/primeseq/"
+  if(grepl("Maggie", init.path)) init.path = WorkingPath
   serv = "local"
 }
-
 
 # source(system.file('app/fxs.R', package = 'ShinySDA', mustWork = TRUE), local = TRUE)
 
@@ -130,7 +140,7 @@ ui <- dashboardPage(skin="red",
                                       textInput("baseURL", "baseURL", 
                                                 value ="https://prime-seq.ohsu.edu"),
                                       textInput("defaultFolder", "defPSfold", 
-                                                value ="Labs/Bimber"),
+                                                value =LabName),
                                       width = 5, background = "olive"
                                       
                                   ))),

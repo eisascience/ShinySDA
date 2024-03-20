@@ -35,19 +35,50 @@ if(file.exists(envv$path2SDA_dyn)) {
   
   
   #update the names
-  # colnames(SDAres$scores) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
-  # rownames(SDAres$loadings[[1]]) <- paste("SDA", 1:ncol(SDAres$scores), sep="")
-  colnames(SDAres$scores) = gsub("V", "SDAV", colnames(SDAres$scores))
-  rownames(SDAres$loadings[[1]]) = gsub("V", "SDAV", rownames(SDAres$loadings[[1]]))
+  colnames(SDAres$scores) <- paste("SDAV", 1:ncol(SDAres$scores), sep="")
+  rownames(SDAres$loadings[[1]]) <- paste("SDAV", 1:ncol(SDAres$scores), sep="")
+  # colnames(SDAres$scores) = gsub("V", "SDAV", colnames(SDAres$scores))
+  # rownames(SDAres$loadings[[1]]) = gsub("V", "SDAV", rownames(SDAres$loadings[[1]]))
   
 
+  BaseNameFile = paste0(envv$path2SDA_dyn, "_dimnames.rds")
   
-  if(file.exists(paste0(envv$path2SDA_dyn, "_dimnames.rds"))){
+  if(file.exists(BaseNameFile)){
     # print(head(NamesDimsDF))
-    NamesDimsDF = readRDS(paste0(envv$path2SDA_dyn, "_dimnames.rds"))
+    NamesDimsDF = readRDS(BaseNameFile)
     rownames(SDAres$scores) <- NamesDimsDF[[1]]
     colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
+  } else {
+    
+    BaseNameFile = paste0(dirname(dirname(envv$path2SDA_dyn)), "/",
+                          basename(SDAres$command_arguments$data),  "_dimnames.rds")
+    
+    if(file.exists( BaseNameFile) ){
+      
+      NamesDimsDF = readRDS(BaseNameFile)
+      rownames(SDAres$scores) <- NamesDimsDF[[1]]
+      colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
+    } else {
+      
+      tempFiles = list.files(dirname(dirname(envv$path2SDA_dyn)), full.names = T)
+      
+      if(sum(grepl("_dimnames.rds", tempFiles)) > 0)
+      {
+        NamesDimsDF = tempFiles[grepl("_dimnames.rds", tempFiles)]
+        rownames(SDAres$scores) <- NamesDimsDF[[1]]
+        colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
+      }
+      
+    }
   }
+  
+  
+  # if(file.exists(paste0(envv$path2SDA_dyn, "_dimnames.rds"))){
+  #   # print(head(NamesDimsDF))
+  #   NamesDimsDF = readRDS(paste0(envv$path2SDA_dyn, "_dimnames.rds"))
+  #   rownames(SDAres$scores) <- NamesDimsDF[[1]]
+  #   colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
+  # }
   
   # print(SDAres$loadings[[1]][1:10,1:10])
   
@@ -171,7 +202,7 @@ Run_MetaDF_local_evv <- function(envv, input, session){
     
     
     
-    PossibleMetaVec = c("SampleDate", "SubjectId", "ExpID", 
+    PossibleMetaVec = unique( c("SampleDate", "SubjectId", "ExpID", 
                         "DonorID", "DonorIDa", "DonorIDb", "DonorIDc", 
                         "SingleR_Labels","SingleR_Labels_Fine",
                         "hpca.label", "hpca.label.fine",
@@ -185,7 +216,10 @@ Run_MetaDF_local_evv <- function(envv, input, session){
                         "LibraryLayout",
                         "Submission", "SRR", "AgeGroup", "Pathology", "Origin", 
                         "RNA_snn_res.0.2", "RNA_snn_res.0.4", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2",
-                        "Pheno", "Pheno1", "Pheno2", "Pheno3")
+                        "Pheno", "Pheno1", "Pheno2", "Pheno3",
+                        "scGateConsensus", "immgen.label", "monaco.label",
+                         "SingleRConsensus",  "BatchId", "Age", "Sex", "Race", "Final.Dx", 
+                         "Dx", "Addl.Dx", "B27pos", "Systemic.Activity", "Eye.Activity", "CellViability") )
     
     PossibleMetaVec = PossibleMetaVec[PossibleMetaVec %in% colnames(MetaDF)]
     
@@ -233,7 +267,7 @@ Run_MetaDF_local_evv <- function(envv, input, session){
     for(featX in PossibleMetaVec){
       #TODO: seprate out cleaning of meta in a fx
       
-      if(featX == "SubjectId") { MetaDF[,featX] = paste0("Rh", MetaDF[,featX]) }
+      if(featX == "SubjectId") { MetaDF[,featX] = paste0("ID_", MetaDF[,featX]) }
       if(featX %in% c("RNA_snn_res.0.2", "RNA_snn_res.0.6", "RNA_snn_res.1.2")) { MetaDF[,featX] = paste0("Cl", MetaDF[,featX]) }
       
       MetaDF[,featX] = factor( MetaDF[,featX])
@@ -242,8 +276,8 @@ Run_MetaDF_local_evv <- function(envv, input, session){
     # print(head(MetaDF))
     
     MetaDF$library_size = MetaDF$nCount_RNA
-    MetaDF$ExpID = MetaDF$Population
-    MetaDF$EXP.ID = MetaDF$RNA_snn_res.0.2 #TODO this is a patch EXP.ID needs to be removed and consquent fx updated to use envv$PossibleMetaVec
+    # MetaDF$ExpID = MetaDF$Population
+    # MetaDF$EXP.ID = MetaDF$RNA_snn_res.0.2 #TODO this is a patch EXP.ID needs to be removed and consquent fx updated to use envv$PossibleMetaVec
     
     envv$MetaDF = MetaDF
     
@@ -281,21 +315,24 @@ rownames(MetaDF) = MetaDF$cellbarcode
 envv$InfoBox_sub = "Metadata Loaded"
 
 
-PossibleMetaVec =  c("SampleDate", "SubjectId", "ExpID", 
-                     "DonorID", "DonorIDa", "DonorIDb", "DonorIDc", 
-                     "SingleR_Labels","SingleR_Labels_Fine",
-                     "hpca.label", "hpca.label.fine",
-                     "blueprint.label", "blueprint.label.fine",
-                     "predicted_labels", "majority_voting",
-                     "Phase", "BarcodePrefix", "DatasetId",
-                     "Population", "WorkbookId", "Tissue", 
-                     "Stim", "cDNA_ID", "scDblFinder.class", "orig.ident",
-                     "SRAStudy", "BioProject", "Study_Pubmed_id", "ProjectID", 
-                     "Sample", "BioSample", "SampleType", "TaxID",
-                     "LibraryLayout",
-                     "Submission", "SRR", "AgeGroup", "Pathology", "Origin", 
-                     "RNA_snn_res.0.2", "RNA_snn_res.0.4", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2",
-                     "Pheno", "Phenp1", "Pheno2", "Pheno3")
+PossibleMetaVec =  unique( c("SampleDate", "SubjectId", "ExpID", 
+                             "DonorID", "DonorIDa", "DonorIDb", "DonorIDc", 
+                             "SingleR_Labels","SingleR_Labels_Fine",
+                             "hpca.label", "hpca.label.fine",
+                             "blueprint.label", "blueprint.label.fine",
+                             "predicted_labels", "majority_voting",
+                             "Phase", "BarcodePrefix", "DatasetId",
+                             "Population", "WorkbookId", "Tissue", 
+                             "Stim", "cDNA_ID", "scDblFinder.class", "orig.ident",
+                             "SRAStudy", "BioProject", "Study_Pubmed_id", "ProjectID", 
+                             "Sample", "BioSample", "SampleType", "TaxID",
+                             "LibraryLayout",
+                             "Submission", "SRR", "AgeGroup", "Pathology", "Origin", 
+                             "RNA_snn_res.0.2", "RNA_snn_res.0.4", "RNA_snn_res.0.6", "RNA_snn_res.0.8", "RNA_snn_res.1.2",
+                             "Pheno", "Pheno1", "Pheno2", "Pheno3",
+                             "scGateConsensus", "immgen.label", "monaco.label",
+                             "SingleRConsensus",  "BatchId", "Age", "Sex", "Race", "Final.Dx", 
+                             "Dx", "Addl.Dx", "B27pos", "Systemic.Activity", "Eye.Activity", "CellViability") )
 
 PossibleMetaVec = PossibleMetaVec[PossibleMetaVec %in% colnames(MetaDF)]
 
@@ -386,8 +423,12 @@ if(!is.null(envv$sda_path)){
       colnames(SDAres$loadings[[1]]) <- NamesDimsDF[[2]]
       
     }
-    colnames(SDAres$scores) = gsub("V", "SDAV", colnames(SDAres$scores))
-    rownames(SDAres$loadings[[1]]) = gsub("V", "SDAV", rownames(SDAres$loadings[[1]]))
+    
+    # colnames(SDAres$scores) = gsub("V", "SDAV", colnames(SDAres$scores))
+    # rownames(SDAres$loadings[[1]]) = gsub("V", "SDAV", rownames(SDAres$loadings[[1]]))
+    
+    colnames(SDAres$scores) <- paste("SDAV", 1:ncol(SDAres$scores), sep="")
+    rownames(SDAres$loadings[[1]]) <- paste("SDAV", 1:ncol(SDAres$scores), sep="")
     
     if(is.null(envv$MetaDF)){
       
